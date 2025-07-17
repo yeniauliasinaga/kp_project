@@ -7,43 +7,39 @@ use App\Models\Hotel;
 use App\Models\Pegawai;
 use App\Models\User;
 use App\Models\Unit;
+use Carbon\Carbon;
 
 class HotelSeeder extends Seeder
 {
     public function run()
     {
-        $pegawai = Pegawai::first();
+        $pegawaiList = Pegawai::take(5)->get(); // Ambil 5 pegawai berbeda
         $unit = Unit::first();
         $user = User::first();
 
-        if (!$pegawai || !$unit || !$user) {
-            $this->command->warn("Seeder Hotel dilewati karena data pegawai/unit/user belum ada.");
+        if ($pegawaiList->count() < 5 || !$unit || !$user) {
+            $this->command->warn("Seeder Hotel dilewati karena data pegawai/unit/user belum cukup.");
             return;
         }
 
-        $hotels = [
-            [
-                'pegawai_id' => $pegawai->id,
-                'nama_hotel' => 'Hotel Bintang 5',
-                'unit_id' => $unit->id,
-                'biaya' => 750000.00,
-                'tanggal_masuk' => now()->toDateString(),
-                'tanggal_keluar' => now()->addDays(2)->toDateString(),
-                'created_by' => $user->id,
-            ],
-            [
-                'pegawai_id' => $pegawai->id,
-                'nama_hotel' => 'Hotel Mawar Indah',
-                'unit_id' => $unit->id,
-                'biaya' => 450000.00,
-                'tanggal_masuk' => now()->addDays(5)->toDateString(),
-                'tanggal_keluar' => now()->addDays(7)->toDateString(),
-                'created_by' => $user->id,
-            ],
+        $namaHotels = [
+            'Hotel Bintang 5 Medan', 'Hotel Permata Biru', 'Hotel Grand Sumatera',
+            'Hotel Mawar Indah', 'Hotel Nusantara', 'Hotel Batang Kuis',
+            'Hotel Danau Toba', 'Hotel Asri Sejuk', 'Hotel Palma Raya',
+            'Hotel Cempaka Emas', 'Hotel Deli Indah', 'Hotel Rindu Alam',
+            'Hotel Karya Nyata', 'Hotel Panorama', 'Hotel Bahagia'
         ];
 
-        foreach ($hotels as $hotel) {
-            Hotel::create($hotel);
+        for ($i = 0; $i < 15; $i++) {
+            Hotel::create([
+                'pegawai_id' => $pegawaiList[$i % 5]->id,
+                'unit_id' => $unit->id,
+                'nama_hotel' => $namaHotels[$i],
+                'biaya' => rand(400000, 850000),
+                'tanggal_masuk' => Carbon::now()->addDays($i)->toDateString(),
+                'tanggal_keluar' => Carbon::now()->addDays($i + 2)->toDateString(),
+                'created_by' => $user->id,
+            ]);
         }
     }
 }

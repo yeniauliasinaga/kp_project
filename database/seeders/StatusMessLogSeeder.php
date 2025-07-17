@@ -12,23 +12,22 @@ class StatusMessLogSeeder extends Seeder
     public function run()
     {
         $user = User::first();
-        $messList = DataMess::all();
+        $messes = DataMess::all();
 
-        if (!$user || $messList->isEmpty()) {
-            $this->command->warn("User atau Data Mess belum tersedia. Seeder StatusMessLog dilewati.");
+        if (!$user || $messes->isEmpty()) {
+            $this->command->warn("StatusMessLogSeeder: User atau DataMess tidak tersedia.");
             return;
         }
 
-        foreach ($messList as $mess) {
+        for ($i = 0; $i < 15; $i++) {
+            $mess = $messes[$i % $messes->count()];
             StatusMessLog::create([
                 'mess_id' => $mess->id,
-                'status' => $mess->status ?? 'tersedia',
-                'waktu_perubahan' => now(),
-                'keterangan' => 'Status awal mess',
+                'status' => $mess->status,
+                'keterangan' => 'Log status mess ke-' . ($i + 1),
+                'waktu_perubahan' => now()->addMinutes($i * 10),
                 'created_by' => $user->id,
             ]);
         }
-
-        $this->command->info("✅ StatusMessLogSeeder berhasil dijalankan.");
     }
 }

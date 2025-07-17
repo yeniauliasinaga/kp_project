@@ -12,20 +12,22 @@ class StatusKendaraanLogSeeder extends Seeder
     public function run()
     {
         $user = User::first();
+        $kendaraans = Kendaraan::all();
 
-        if (!$user || Kendaraan::count() == 0) {
+        if (!$user || $kendaraans->isEmpty()) {
+            $this->command->warn("StatusKendaraanLogSeeder: Data tidak lengkap.");
             return;
         }
 
-        $kendaraans = Kendaraan::all();
+        for ($i = 0; $i < 15; $i++) {
+            $kendaraan = $kendaraans[$i % $kendaraans->count()];
 
-        foreach ($kendaraans as $kendaraan) {
             StatusKendaraanLog::create([
                 'no_polisi' => $kendaraan->no_polisi,
                 'status' => $kendaraan->status,
-                'keterangan' => 'Status awal kendaraan',
+                'keterangan' => 'Log perubahan status kendaraan ke-' . ($i + 1),
                 'created_by' => $user->id,
-                'waktu_perubahan' => now()
+                'waktu_perubahan' => now()->addMinutes($i * 5),
             ]);
         }
     }

@@ -5,42 +5,37 @@ namespace Database\Seeders;
 use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ProposalSeeder extends Seeder
 {
     public function run()
     {
-        // Cari user berdasarkan role yang disimpan di tabel pegawai
-        $admin = User::whereHas('pegawai', fn($q) => $q->where('role', 'admin'))->first();
+        $superadmin = User::whereHas('pegawai', fn($q) => $q->where('role', 'superadmin'))->first();
         $staff = User::whereHas('pegawai', fn($q) => $q->where('role', 'staff'))->first();
 
-        // Jika user tidak ditemukan, tampilkan peringatan
-        if (!$admin || !$staff) {
-            $this->command->warn("Seeder Proposal: Tidak menemukan user dengan role admin atau staff.");
+        if (!$superadmin || !$staff) {
+            $this->command->warn("Seeder Proposal: Tidak menemukan user dengan role superadmin atau staff.");
             return;
         }
 
-        $proposals = [
-            [
-                'nama_instansi' => 'Yayasan Pendidikan ABC',
-                'disposisi' => 'disetujui',
-                'nilai_bantuan' => 50000000,
-                'tanggal_proposal' => now()->subDays(15),
-                'deskripsi' => 'Permohonan bantuan untuk pembangunan sekolah',
-                'created_by' => $admin->id,
-            ],
-            [
-                'nama_instansi' => 'Komunitas Lingkungan Hijau',
-                'disposisi' => 'tidak disetujui',
-                'nilai_bantuan' => 25000000,
-                'tanggal_proposal' => now()->subDays(7),
-                'deskripsi' => 'Program penghijauan di sekitar pabrik',
-                'created_by' => $staff->id,
-            ],
+        $instansis = [
+            'Yayasan Pendidikan ABC', 'Komunitas Lingkungan Hijau', 'Lembaga Sosial Sejahtera',
+            'Yayasan Anak Bangsa', 'Forum Masyarakat Adat', 'Perkumpulan Petani Mandiri',
+            'Karang Taruna Muda', 'Badan Dakwah Islam', 'Lembaga Seni Budaya',
+            'Yayasan Cinta Kasih', 'Asosiasi Nelayan Bahari', 'Komunitas Literasi Nusantara',
+            'Paguyuban Wirausaha Tani', 'Yayasan Bina Remaja', 'Komunitas Hijau Lestari'
         ];
 
-        foreach ($proposals as $proposal) {
-            Proposal::create($proposal);
+        foreach ($instansis as $i => $instansi) {
+            Proposal::create([
+                'nama_instansi' => $instansi,
+                'disposisi' => $i % 2 === 0 ? 'disetujui' : 'tidak disetujui',
+                'nilai_bantuan' => rand(5, 50) * 1000000,
+                'tanggal_proposal' => now()->subDays(rand(5, 30)),
+                'deskripsi' => 'Pengajuan proposal bantuan untuk kegiatan sosial di wilayah ' . Str::random(5),
+                'created_by' => $i % 2 === 0 ? $superadmin->id : $staff->id,
+            ]);
         }
     }
 }

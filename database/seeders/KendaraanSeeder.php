@@ -10,54 +10,21 @@ class KendaraanSeeder extends Seeder
     public function run()
     {
         $vehicles = [
-            [
-                'no_polisi' => 'BK 1234 AB',
-                'merek' => 'Toyota',
-                'model' => 'Avanza',
-                'bahan_bakar' => 'Bensin',
-                'status_kepemilikan' => 'milik perusahaan',
-                'status' => 'tersedia'
-            ],
-            [
-                'no_polisi' => 'BK 5678 CD',
-                'merek' => 'Daihatsu',
-                'model' => 'Xenia',
-                'bahan_bakar' => 'Bensin',
-                'status_kepemilikan' => 'milik perusahaan',
-                'status' => 'tersedia'
-            ],
-            [
-                'no_polisi' => 'BK 9012 EF',
-                'merek' => 'Mitsubishi',
-                'model' => 'Pajero',
-                'bahan_bakar' => 'Solar',
-                'status_kepemilikan' => 'sewa',
-                'status' => 'digunakan'
-            ],
-            [
-                'no_polisi' => 'BK 2312 TF',
-                'merek' => 'Mitsubishi',
-                'model' => 'L300',
-                'bahan_bakar' => 'Solar',
-                'status_kepemilikan' => 'sewa',
-                'status' => 'digunakan'
-            ],
-            [
-                'no_polisi' => 'BK 2012 PE',
-                'merek' => 'BMW',
-                'model' => 'Super Car',
-                'bahan_bakar' => 'Solar',
-                'status_kepemilikan' => 'sewa',
-                'status' => 'digunakan'
-            ],
-            [
-                'no_polisi' => 'BK1234AA',
-                'merek' => 'Toyota',
-                'model' => 'Pajero',
-                'bahan_bakar' => 'Solar',
-                'status_kepemilikan' => 'milik perusahaan',
-                'status' => 'digunakan'
-            ],
+            ['no_polisi' => 'BK 1234 AB', 'merek' => 'Toyota', 'model' => 'Avanza', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 5678 CD', 'merek' => 'Daihatsu', 'model' => 'Xenia', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 9012 EF', 'merek' => 'Mitsubishi', 'model' => 'Pajero', 'bahan_bakar' => 'Solar', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK 2312 TF', 'merek' => 'Mitsubishi', 'model' => 'L300', 'bahan_bakar' => 'Solar', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK 2012 PE', 'merek' => 'BMW', 'model' => 'Super Car', 'bahan_bakar' => 'Solar', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK1234AA', 'merek' => 'Toyota', 'model' => 'Pajero', 'bahan_bakar' => 'Solar', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK 4567 GH', 'merek' => 'Honda', 'model' => 'Mobilio', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'sewa', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 6789 IJ', 'merek' => 'Suzuki', 'model' => 'Ertiga', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 1011 KL', 'merek' => 'Nissan', 'model' => 'Grand Livina', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK 1213 MN', 'merek' => 'Kia', 'model' => 'Rio', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 1415 OP', 'merek' => 'Ford', 'model' => 'Everest', 'bahan_bakar' => 'Solar', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK 1617 QR', 'merek' => 'Chevrolet', 'model' => 'Spin', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 1819 ST', 'merek' => 'Hyundai', 'model' => 'Stargazer', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
+            ['no_polisi' => 'BK 2021 UV', 'merek' => 'Mazda', 'model' => 'CX-5', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'milik perusahaan', 'status' => 'tersedia'],
+            ['no_polisi' => 'BK 2223 WX', 'merek' => 'Wuling', 'model' => 'Confero', 'bahan_bakar' => 'Bensin', 'status_kepemilikan' => 'sewa', 'status' => 'digunakan'],
         ];
 
         foreach ($vehicles as $vehicle) {

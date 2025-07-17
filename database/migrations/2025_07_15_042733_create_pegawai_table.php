@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama');
             $table->string('nip')->unique();
             $table->string('jabatan');
-            $table->enum('role', ['staff', 'admin', 'superadmin']);
+            $table->enum('role', ['staff', 'superadmin']);
             $table->foreignId('unit_id')->constrained('unit');
             $table->text('alamat')->nullable();
             $table->timestamps();

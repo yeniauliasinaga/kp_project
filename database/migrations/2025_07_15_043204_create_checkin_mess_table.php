@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('checkin_mess', function (Blueprint $table) {
-            $table->id(); // hanya satu kali
+            $table->id(); 
             $table->foreignId('mess_id')->constrained('data_mess');
             $table->string('nama_tamu');
             $table->string('asal');
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('waktu_selesai');
             $table->decimal('biaya', 12, 2);
             $table->foreignId('created_by')->constrained('users');
-            $table->timestamps(); // hanya satu kali
+            $table->timestamps(); 
         });
     }
 

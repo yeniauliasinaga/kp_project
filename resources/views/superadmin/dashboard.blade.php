@@ -1,4 +1,4 @@
-@extends('staff.staffLayout')
+@extends('layouts.sidebarSuperadmin')
 
 @section('content')
 <main class="flex-1 p-6">

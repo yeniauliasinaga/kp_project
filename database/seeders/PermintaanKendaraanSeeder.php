@@ -7,38 +7,34 @@ use App\Models\PermintaanKendaraan;
 use App\Models\User;
 use App\Models\Supir;
 use App\Models\Kendaraan;
+use Carbon\Carbon;
 
 class PermintaanKendaraanSeeder extends Seeder
 {
     public function run()
     {
         $user = User::first();
-        $supir = Supir::first();
-        $kendaraans = Kendaraan::where('status', 'tersedia')->get();
+        $supirs = Supir::take(5)->get();
+        $kendaraans = Kendaraan::all();
 
-        if (!$user || !$supir || $kendaraans->isEmpty()) {
-            $this->command->warn("❌ User, Supir, atau Kendaraan belum tersedia. Seeder PermintaanKendaraan dilewati.");
+        if (!$user || $supirs->isEmpty() || $kendaraans->isEmpty()) {
+            $this->command->warn("❌ Data Supir, Kendaraan, atau User belum tersedia.");
             return;
         }
 
-        $requests = [];
+        for ($i = 0; $i < 15; $i++) {
+            $kendaraan = $kendaraans[$i % $kendaraans->count()];
+            $supir = $supirs[$i % $supirs->count()];
 
-        foreach ($kendaraans as $index => $kendaraan) {
-            $requests[] = [
+            PermintaanKendaraan::create([
                 'supir_id' => $supir->id,
                 'no_polisi' => $kendaraan->no_polisi,
                 'status_kepemilikan' => $kendaraan->status_kepemilikan,
-                'jadwal_berangkat' => now()->addDays($index + 1),
-                'jadwal_pulang' => now()->addDays($index + 3),
-                'tujuan' => $index % 2 === 0 ? 'dalam wilayah' : 'luar wilayah',
+                'jadwal_berangkat' => Carbon::now()->addDays($i),
+                'jadwal_pulang' => Carbon::now()->addDays($i + 2),
+                'tujuan' => $i % 2 === 0 ? 'dalam wilayah' : 'luar wilayah',
                 'created_by' => $user->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
+            ]);
         }
-
-        PermintaanKendaraan::insert($requests);
-
-        $this->command->info("✅ PermintaanKendaraanSeeder berhasil dijalankan dengan " . count($requests) . " data.");
     }
 }

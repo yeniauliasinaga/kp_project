@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\CheckinMess; // ⬅️ Tambahkan ini
+use App\Models\CheckinMess;
 use App\Models\User;
 use App\Models\DataMess;
 
@@ -12,18 +12,25 @@ class CheckinMessSeeder extends Seeder
     public function run()
     {
         $user = User::first();
-        $mess = DataMess::first();
+        $messes = DataMess::take(15)->get();
 
-        if (!$user || !$mess) return;
+        if (!$user || $messes->isEmpty()) {
+            $this->command->warn("CheckinMessSeeder: User atau Mess tidak tersedia.");
+            return;
+        }
 
-        CheckinMess::create([
-            'mess_id' => $mess->id,
-            'nama_tamu' => 'John Doe',
-            'asal' => 'Jakarta',
-            'waktu_mulai' => now(),
-            'waktu_selesai' => now()->addDays(3),
-            'biaya' => 250000,
-            'created_by' => $user->id,
-        ]);
+        $asalList = ['Medan', 'Jakarta', 'Bandung', 'Padang', 'Aceh', 'Pekanbaru', 'Palembang'];
+
+        for ($i = 0; $i < 15; $i++) {
+            CheckinMess::create([
+                'mess_id' => $messes[$i % $messes->count()]->id,
+                'nama_tamu' => 'Tamu ' . chr(65 + $i),
+                'asal' => $asalList[$i % count($asalList)],
+                'waktu_mulai' => now()->addDays($i),
+                'waktu_selesai' => now()->addDays($i + 2),
+                'biaya' => rand(150000, 350000),
+                'created_by' => $user->id,
+            ]);
+        }
     }
 }

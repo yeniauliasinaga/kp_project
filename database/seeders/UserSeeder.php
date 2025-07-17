@@ -2,43 +2,40 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    public static $userMap = []; // Simpan email → ID mapping untuk PegawaiSeeder
+    public static array $userMap = [];
 
     public function run(): void
     {
+        // Format: email => [nama, password]
         $users = [
-            ['name' => 'Dewi Kartika', 'email' => 'dewi.kartika@example.com'],
-            ['name' => 'Budi Santoso', 'email' => 'budi.santoso@example.com'],
-            ['name' => 'Sari Ayu', 'email' => 'sari.ayu@example.com'],
-            ['name' => 'Ahmad Fauzi', 'email' => 'ahmad.fauzi@example.com'],
-            ['name' => 'Rina Marlina', 'email' => 'rina.marlina@example.com'],
-            ['name' => 'Teguh Prasetyo', 'email' => 'teguh.prasetyo@example.com'],
-            ['name' => 'Lina Wulandari', 'email' => 'lina.wulandari@example.com'],
-
-            // Staffs
-            ['name' => 'Doni Saputra', 'email' => 'doni.saputra@example.com'],
-            ['name' => 'Mega Putri', 'email' => 'mega.putri@example.com'],
-            ['name' => 'Yusuf Hidayat', 'email' => 'yusuf.hidayat@example.com'],
-            ['name' => 'Intan Permata', 'email' => 'intan.permata@example.com'],
-            ['name' => 'Rizky Maulana', 'email' => 'rizky.maulana@example.com'],
-            ['name' => 'Nadya Salsabila', 'email' => 'nadya.salsabila@example.com'],
+            'dewi.kartika@example.com' => ['Dewi Kartika', 'password123'],
+            'doni.saputra@example.com' => ['Doni Saputra', 'doni123'],
+            'mega.putri@example.com' => ['Mega Putri', 'mega123'],
+            'yusuf.hidayat@example.com' => ['Yusuf Hidayat', 'yusuf123'],
+            'intan.permata@example.com' => ['Intan Permata', 'intan123'],
+            'rizky.maulana@example.com' => ['Rizky Maulana', 'rizky123'],
+            'nadya.salsabila@example.com' => ['Nadya Salsabila', 'nadya123'],
+            'budi.santoso@example.com' => ['Budi Santoso', 'budi123'],
+            'sari.ayu@example.com' => ['Sari Ayu', 'sari123'],
+            'ahmad.fauzi@example.com' => ['Ahmad Fauzi', 'ahmad123'],
+            'rina.marlina@example.com' => ['Rina Marlina', 'rina123'],
+            'teguh.prasetyo@example.com' => ['Teguh Prasetyo', 'teguh123'],
+            'lina.wulandari@example.com' => ['Lina Wulandari', 'superadmin123'], // ini superadmin
         ];
 
-        foreach ($users as $u) {
-            $id = DB::table('users')->insertGetId([
-                'email' => $u['email'],
-                'password' => Hash::make('password'),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($users as $email => [$name, $password]) {
+            $user = User::firstOrCreate(
+                ['email' => $email],
+                ['password' => Hash::make($password)]
+            );
 
-            self::$userMap[$u['name']] = $id;
+            self::$userMap[$name] = $user->id;
         }
     }
 }
