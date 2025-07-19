@@ -43,10 +43,10 @@
                     <td class="p-2">{{ $row->tanggal }}</td>
                     <td class="p-2">Rp{{ number_format($row->biaya, 0, ',', '.') }}</td>
                     <td class="p-2">
-                        <a href="{{ route('superadmin.tiketpesawat.edit', $row->id) }}" class="text-blue-600 hover:underline">Edit</a>
+                        <a href="{{ route('superadmin.tiketpesawat.edit', $row->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
                         <form action="{{ route('superadmin.tiketpesawat.delete', $row->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin hapus?')">
                             @csrf @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline ml-2">Hapus</button>
+                            <button type="submit" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
                         </form>
                     </td>
                 </tr>

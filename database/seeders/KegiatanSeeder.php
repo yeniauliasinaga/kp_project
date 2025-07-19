@@ -40,20 +40,26 @@ class KegiatanSeeder extends Seeder
         ];
 
         for ($i = 0; $i < 30; $i++) {
-            $mulai = now()->addDays(rand(-10, 10))->setTime(rand(8, 16), rand(0, 59));
-            $selesai = (clone $mulai)->addHours(rand(1, 4));
+        $mulai = now()->addDays(rand(-10, 10))->setTime(rand(8, 16), rand(0, 59));
+        $selesai = (clone $mulai)->addHours(rand(1, 4));
 
-            $status = $selesai->isPast() ? 'selesai' : 'berlangsung';
+        if ($selesai->isPast()) {
+            $status = 'selesai';
+        } elseif ($mulai->isFuture()) {
+            $status = 'akan_datang';
+        } else {
+            $status = 'berlangsung';
+        }
 
-            Kegiatan::create([
-                'nama_kegiatan' => $namaKegiatanList[array_rand($namaKegiatanList)] . ' #' . Str::random(4),
-                'tempat' => $tempatList[array_rand($tempatList)],
-                'biaya' => rand(1, 20) * 1000000,
-                'waktu_mulai' => $mulai,
-                'waktu_selesai' => $selesai,
-                'status' => $status,
-                'created_by' => $userIds[array_rand($userIds)],
-            ]);
+        Kegiatan::create([
+            'nama_kegiatan' => $namaKegiatanList[array_rand($namaKegiatanList)] . ' #' . Str::random(4),
+            'tempat' => $tempatList[array_rand($tempatList)],
+            'biaya' => rand(1, 20) * 1000000,
+            'waktu_mulai' => $mulai,
+            'waktu_selesai' => $selesai,
+            'status' => $status,
+            'created_by' => $userIds[array_rand($userIds)],
+        ]);
 
         }
     }

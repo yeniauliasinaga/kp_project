@@ -137,14 +137,14 @@ class SuperadminController extends Controller
             'biaya' => 'required|numeric',
             'waktu_mulai' => 'required|date',
             'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
-            'status' => 'in:berlangsung,selesai',
+            'status' => 'required|in:akan_datang,berlangsung,selesai',
         ]);
 
         $validated['created_by'] = Auth::id();
 
         Kegiatan::create($validated);
 
-        return redirect()->back()->with('success', 'Kegiatan berhasil ditambahkan.');
+        return redirect()->route('superadmin.kegiatan')->with('success', 'Kegiatan berhasil ditambahkan.');
     }
 
 
@@ -156,15 +156,16 @@ class SuperadminController extends Controller
 
     public function kegiatanUpdate(Request $request, $id)
     {
-        $validated = $request->validate([
+         $validated = $request->validate([
             'nama_kegiatan' => 'required|string|max:255',
             'tempat' => 'required|string|max:255',
             'biaya' => 'required|numeric',
             'waktu_mulai' => 'required|date',
             'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
-            'status' => 'required|in:berlangsung,selesai',
+            'status' => 'required|in:akan_datang,berlangsung,selesai',
         ]);
 
+        $validated['created_by'] = Auth::id();
         $kegiatan = Kegiatan::findOrFail($id);
         $kegiatan->update($validated);
 
@@ -232,7 +233,13 @@ class SuperadminController extends Controller
     // ===================== MESS =====================
     public function datamess()
     {
-        $mess = DataMess::latest()->get();
+        $status = request('status');
+
+        $mess = DataMess::when($status, function ($query, $status) {
+        return $query->where('status', $status);
+
+        })->get();
+
         return view('superadmin.mess', compact('mess'));
     }
 

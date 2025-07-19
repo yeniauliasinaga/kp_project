@@ -32,11 +32,11 @@
             <td class="p-2 text-center">{{ $data->unit->nama_unit ?? '-' }}</td>
             <td class="p-2 text-center">{{ $data->alamat }}</td>
             <td class="p-2 text-center">
-              <a href="{{ route('superadmin.pegawai.edit', $data->id) }}" class="text-blue-600 hover:underline">Edit</a>
+              <a href="{{ route('superadmin.pegawai.edit', $data->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
               <form action="{{ route('superadmin.pegawai.delete', $data->id) }}" method="POST" class="inline">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="text-red-600 hover:underline ml-2" onclick="return confirm('Yakin ingin hapus?')">Hapus</button>
+                <button type="submit" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600" onclick="return confirm('Yakin ingin hapus?')">Hapus</button>
               </form>
             </td>
           </tr>

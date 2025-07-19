@@ -110,6 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
 
+    // STAFF
     Route::prefix('staff')->middleware(['auth', 'role:staff'])->controller(StaffController::class)->group(function () {
         
         Route::get('/dashboard', 'dashboard')->name('staff.dashboard');
@@ -122,12 +123,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/berita/update/{id}', 'beritaUpdate')->name('staff.berita.update');
 
         // Kegiatan
-        Route::get('/kegiatan', 'kegiatan')->name('staff.kegiatan');
-        Route::get('/kegiatan/tambah', 'kegiatanCreate')->name('staff.kegiatan.create');
-        Route::post('/kegiatan/tambah', 'kegiatanStore')->name('staff.kegiatan.store');
-        Route::get('/kegiatan/edit/{id}', 'kegiatanEdit')->name('staff.kegiatan.edit');
-        Route::post('/kegiatan/update/{id}', 'kegiatanUpdate')->name('staff.kegiatan.update');
+        Route::get('/kegiatan', [StaffController::class, 'kegiatan'])->name('staff.kegiatan');
+        Route::get('/kegiatan/tambah', [StaffController::class, 'kegiatanCreate'])->name('staff.kegiatan.create');
+        Route::post('/kegiatan/tambah', [StaffController::class, 'kegiatanStore'])->name('staff.kegiatan.store');
+        Route::get('/kegiatan/edit/{id}', [StaffController::class, 'kegiatanEdit'])->name('staff.kegiatan.edit');
+        Route::match(['put', 'post'], '/kegiatan/update/{id}', [StaffController::class, 'kegiatanUpdate'])->name('staff.kegiatan.update');
 
+    
         // Tiket Pesawat
         Route::get('/tiket-pesawat', 'tiketPesawat')->name('staff.tiketPesawat');
         Route::get('/tiket-pesawat/tambah', 'tiketPesawatCreate')->name('staff.tiketPesawat.create');

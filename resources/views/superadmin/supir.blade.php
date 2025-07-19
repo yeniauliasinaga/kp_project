@@ -33,15 +33,15 @@
                     <td class="p-2 capitalize">{{ $supir->jenis_kelamin }}</td>
                     <td class="p-2">{{ $supir->no_telepon }}</td>
                     <td class="p-2">{{ $supir->nik }}</td>
-                    <td class="p-2 text-green-700 capitalize">{{ $supir->status }}</td>
+                    <td class="p-2 text-{{ $supir->status == 'tersedia' ? 'green' : 'red' }}-600 capitalize">{{ $supir->status }}</td>
                     <td class="p-2 space-x-2">
-                        <a href="{{ route('superadmin.supir.edit', $supir->id) }}" class="text-blue-600 hover:underline">Edit</a>
+                        <a href="{{ route('superadmin.supir.edit', $supir->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
                         <form action="{{ route('superadmin.supir.delete', $supir->id) }}"
                               method="POST" class="inline"
                               onsubmit="return confirm('Yakin ingin menghapus supir ini?')">
                             @csrf
                             @method('DELETE')
-                            <button class="text-red-600 hover:underline" type="submit">Hapus</button>
+                            <button class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600" type="submit">Hapus</button>
                         </form>
                     </td>
                 </tr>

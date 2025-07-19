@@ -4,11 +4,19 @@
 
 @section('content')
 <div class="p-6">
-    <!-- <h1 class="text-2xl font-bold text-green-700 mb-6">Daftar Mess</h1> -->
-
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold text-green-700 mb-6">Data Mess</h2>
-        <div class="flex gap-3">
+
+        <div class="flex items-center gap-3">
+            <!-- Filter Status -->
+            <form action="{{ route('superadmin.datamess') }}" method="GET" class="flex items-center gap-2">
+                <select name="status" onchange="this.form.submit()" class="text-sm border-gray-300 rounded px-2 py-1">
+                    <option value="" {{ request('status') == '' ? 'selected' : '' }}>Semua</option>
+                    <option value="tersedia" {{ request('status') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                    <option value="terpakai" {{ request('status') == 'terpakai' ? 'selected' : '' }}>Terpakai</option>
+                </select>
+            </form>
+
             <!-- Tombol Tambah Mess -->
             <a href="{{ route('superadmin.datamess.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Mess</a>
         </div>

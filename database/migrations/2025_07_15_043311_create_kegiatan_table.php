@@ -18,7 +18,7 @@ return new class extends Migration
         $table->decimal('biaya', 12, 2);
         $table->timestamp('waktu_mulai');
         $table->timestamp('waktu_selesai');
-        $table->enum('status', ['berlangsung', 'selesai'])->default('berlangsung');
+        $table->enum('status', ['akan_datang', 'berlangsung', 'selesai'])->default('akan_datang');
         $table->foreignId('created_by')->constrained('users');
         $table->timestamps();
     });

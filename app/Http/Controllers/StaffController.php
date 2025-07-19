@@ -7,16 +7,40 @@ use App\Models\Kegiatan;
 use App\Models\TiketPesawat;
 use App\Models\Hotel;
 use App\Models\CheckinMess;
+use App\Models\DataMess;
 use App\Models\PermintaanKendaraan;
+use App\Models\Kendaraan;
 use App\Models\Proposal;
+use App\Models\Supir;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
     // Dashboard
     public function dashboard()
     {
-        return view('staff.dashboard');
+        // Mobil yang tersedia (status: tersedia)
+        $mobilTersedia = Kendaraan::where('status', 'tersedia')->count();
+        $mobilList = Kendaraan::where('status', 'tersedia')->get();
+
+        // Mess yang tersedia (status: tersedia)
+        $messTersedia = DataMess::where('status', 'tersedia')->count();
+        $messList = DataMess::where('status', 'tersedia')->orderBy('lokasi')->take(10)->get();
+
+        // Kegiatan yang sedang berlangsung
+        $acaraBerlangsung = Kegiatan::where('status', 'berlangsung')->count();
+        $acaraList = Kegiatan::orderBy('waktu_mulai', 'desc')->take(10)->get();
+
+        // Tambahkan query untuk berita terbaru (misal 6 berita terbaru)
+        $beritaList = Berita::orderBy('tanggal_publikasi', 'desc')->take(6)->get();
+
+        return view('staff.dashboard', compact(
+            'mobilTersedia', 'mobilList',
+            'messTersedia', 'messList',
+            'acaraBerlangsung', 'acaraList',
+            'beritaList'
+        ));
     }
 
     // ================= BERITA =================
@@ -53,8 +77,8 @@ class StaffController extends Controller
     // ================= KEGIATAN =================
     public function kegiatan()
     {
-        $kegiatans = Kegiatan::latest()->get();
-        return view('staff.kegiatan', compact('kegiatans'));
+        $kegiatan = Kegiatan::latest()->get();
+        return view('staff.kegiatan', compact('kegiatan'));
     }
 
     public function kegiatanCreate()
@@ -64,9 +88,22 @@ class StaffController extends Controller
 
     public function kegiatanStore(Request $request)
     {
-        Kegiatan::create($request->all());
+        $validated = $request->validate([
+            'nama_kegiatan' => 'required|string|max:255',
+            'tempat' => 'required|string|max:255',
+            'biaya' => 'required|numeric',
+            'waktu_mulai' => 'required|date',
+            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'status' => 'required|in:akan_datang,berlangsung,selesai',
+        ]);
+
+        $validated['created_by'] = Auth::id();
+
+        Kegiatan::create($validated);
+
         return redirect()->route('staff.kegiatan')->with('success', 'Kegiatan berhasil ditambahkan.');
     }
+
 
     public function kegiatanEdit($id)
     {
@@ -76,10 +113,22 @@ class StaffController extends Controller
 
     public function kegiatanUpdate(Request $request, $id)
     {
+         $validated = $request->validate([
+            'nama_kegiatan' => 'required|string|max:255',
+            'tempat' => 'required|string|max:255',
+            'biaya' => 'required|numeric',
+            'waktu_mulai' => 'required|date',
+            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'status' => 'required|in:akan_datang,berlangsung,selesai',
+        ]);
+
+        $validated['created_by'] = Auth::id();
         $kegiatan = Kegiatan::findOrFail($id);
-        $kegiatan->update($request->all());
+        $kegiatan->update($validated);
+
         return redirect()->route('staff.kegiatan')->with('success', 'Kegiatan berhasil diperbarui.');
     }
+
 
     // ================= TIKET PESAWAT =================
     public function tiketPesawat()
@@ -121,19 +170,21 @@ class StaffController extends Controller
 
     public function checkinMessCreate()
     {
-        return view('staff.tambahCheckin');
+        $dataMess = DataMess::distinct()->get(); // atau tambahkan unique if needed
+        return view('staff.tambahCheckin', compact('dataMess'));
+    }
+
+    public function checkinMessEdit($id)
+    {
+        $checkin = CheckinMess::findOrFail($id);
+        $dataMess = DataMess::distinct()->get();
+        return view('staff.tambahCheckin', compact('checkin', 'dataMess'));
     }
 
     public function checkinMessStore(Request $request)
     {
         CheckinMess::create($request->all());
         return redirect()->route('staff.checkinMess')->with('success', 'Check-in berhasil ditambahkan.');
-    }
-
-    public function checkinMessEdit($id)
-    {
-        $checkin = CheckinMess::findOrFail($id);
-        return view('staff.tambahCheckin', compact('checkin'));
     }
 
     public function checkinMessUpdate(Request $request, $id)
@@ -152,20 +203,37 @@ class StaffController extends Controller
 
     public function permintaanKendaraanCreate()
     {
-        return view('staff.tambahPermintaanKendaraan');
-    }
-
-    public function permintaanKendaraanStore(Request $request)
-    {
-        PermintaanKendaraan::create($request->all());
-        return redirect()->route('staff.permintaankendaraan')->with('success', 'Permintaan kendaraan berhasil ditambahkan.');
+        $kendaraan = Kendaraan::where('status', 'tersedia')->get();
+        $supir = Supir::all();
+        return view('staff.tambahPermintaanKendaraan', compact('kendaraan', 'supir'));
     }
 
     public function permintaanKendaraanEdit($id)
     {
         $permintaan = PermintaanKendaraan::findOrFail($id);
-        return view('staff.tambahPermintaanKendaraan', compact('permintaan'));
+        $kendaraan = Kendaraan::all();
+        $supir = Supir::all();
+        return view('staff.tambahPermintaanKendaraan', compact('permintaan', 'kendaraan', 'supir'));
     }
+
+    public function permintaanKendaraanStore(Request $request)
+    {
+        $validated = $request->validate([
+            'no_polisi' => 'required',
+            'supir_id' => 'required|exists:supir,id',
+            'status_kepemilikan' => 'required|in:milik perusahaan,sewa',
+            'jadwal_berangkat' => 'required|date',
+            'jadwal_pulang' => 'required|date',
+            'tujuan' => 'required|in:dalam wilayah,luar wilayah',
+        ]);
+
+        $validated['created_by'] = auth()->user()->id;
+
+        PermintaanKendaraan::create($validated);
+
+        return redirect()->route('staff.permintaankendaraan')->with('success', 'Permintaan kendaraan berhasil ditambahkan.');
+    }
+
 
     public function permintaanKendaraanUpdate(Request $request, $id)
     {

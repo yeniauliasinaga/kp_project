@@ -33,19 +33,19 @@
                 @foreach($proposals as $proposal)
                 <tr data-status="{{ $proposal->disposisi }}">
                     <td class="p-2">{{ $proposal->nama_instansi }}</td>
-                    <td class="p-2 capitalize">{{ $proposal->disposisi }}</td>
+                    <td class="p-2 capitalize text-{{ $proposal->disposisi == 'disetujui' ? 'green' : 'red' }}-600 capitalize">{{ $proposal->disposisi }}</td>
                     <td class="p-2">Rp{{ number_format($proposal->nilai_bantuan, 0, ',', '.') }}</td>
                     <td class="p-2">{{ $proposal->tanggal_proposal }}</td>
                     <td class="p-2">{{ $proposal->deskripsi }}</td>
                     <td class="p-2 space-x-2">
                         <a href="{{ route('superadmin.proposal.edit', $proposal->id) }}"
-                            class="text-blue-600 hover:underline">Edit</a>
+                            class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
                         <form action="{{ route('superadmin.proposal.delete', $proposal->id) }}"
                               method="POST" class="inline"
                               onsubmit="return confirm('Yakin ingin menghapus proposal ini?')">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline">Hapus</button>
+                            <button type="submit" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
                         </form>
                     </td>
                 </tr>

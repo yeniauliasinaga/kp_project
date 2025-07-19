@@ -9,6 +9,7 @@
         <div class="flex gap-3">
             <select id="filterStatus" class="border p-2 rounded text-sm text-gray-700">
                 <option value="all">Semua Status</option>
+                <option value="akan_datang">Akan Datang</option>
                 <option value="berlangsung">Sedang Berlangsung</option>
                 <option value="selesai">Selesai</option>
             </select>
@@ -38,7 +39,7 @@
                     <td class="p-2">Rp{{ number_format($item->biaya, 0, ',', '.') }}</td>
                     <td class="p-2">{{ $item->waktu_mulai }}</td>
                     <td class="p-2">{{ $item->waktu_selesai }}</td>
-                    <td class="p-2 text-{{ $item->status == 'berlangsung' ? 'green' : 'gray' }}-600 font-medium">
+                    <td class="p-2 text-{{ $item->status == 'berlangsung' ? 'green' : ($item->status == 'akan_datang' ? 'blue' : 'gray') }}-600 font-medium">
                         {{ ucfirst($item->status) }}
                     </td>
                     <td class="px-4 py-2 space-x-2">
