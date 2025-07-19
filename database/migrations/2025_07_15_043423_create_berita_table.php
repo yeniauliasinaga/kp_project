@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('link');
             $table->enum('jenis_berita', ['positif', 'negatif']);
             $table->date('tanggal_publikasi');
-            $table->string('gambar')->comment('Path ke storage/app/public/berita/');
+            $table->string('gambar')->comment('Nama file gambar di public/asset/img/berita/');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });

@@ -27,6 +27,11 @@ class User extends Authenticatable
         return $this->hasOne(Pegawai::class, 'user_id');
     }
 
+    // Helper method untuk cek role
+    public function hasRole($role)
+    {
+        return $this->pegawai && $this->pegawai->role === $role;
+    }
 
     /**
      * The attributes that should be hidden for serialization.

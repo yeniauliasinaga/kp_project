@@ -1,95 +1,83 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Form Tambah Supir</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-start min-h-screen">
+@extends('layouts.app')
 
-  <!-- Sidebar -->
-  <aside id="sidebar-container" class="w-60 bg-white shadow-md p-4"></aside>
+@section('content')
+<div class="w-full max-w-3xl mx-auto bg-yellow-100 p-8 mt-10 rounded-xl shadow-lg">
+    <div class="mb-6 text-center">
+        <h2 class="text-xl font-bold text-green-700">
+            {{ isset($supir) ? 'Edit Supir' : 'Form Tambah Supir' }}
+        </h2>
+    </div>
 
-  <!-- Main Content -->
-  <main class="flex-1 p-10">
-    <div class="w-full max-w-3xl mx-auto bg-yellow-100 p-8 rounded-xl shadow-lg">
-      <div class="mb-6 text-center">
-        <h2 class="text-xl font-bold text-green-700">Form Tambah Supir</h2>
-      </div>
-
-      <form class="space-y-6" method="POST" action="/supir">
-        <!-- CSRF Token -->
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <form method="POST"
+          action="{{ isset($supir) ? route('superadmin.supir.update', $supir->id) : route('superadmin.supir.store') }}"
+          class="space-y-6">
+        @csrf
+        @if(isset($supir))
+            @method('POST') {{-- Menyesuaikan route POST update --}}
+        @endif
 
         <!-- Nama Lengkap -->
         <div>
-          <label class="block font-semibold mb-1">Nama Lengkap</label>
-          <input type="text" name="nama_lengkap" class="w-full p-2 border rounded" placeholder="Masukkan nama lengkap">
+            <label class="block font-semibold mb-1">Nama Lengkap</label>
+            <input type="text" name="nama_lengkap" class="w-full p-2 border rounded"
+                value="{{ old('nama_lengkap', $supir->nama_lengkap ?? '') }}"
+                placeholder="Masukkan nama lengkap">
         </div>
 
         <!-- Tanggal Lahir -->
         <div>
-          <label class="block font-semibold mb-1">Tanggal Lahir</label>
-          <input type="date" name="tanggal_lahir" class="w-full p-2 border rounded">
+            <label class="block font-semibold mb-1">Tanggal Lahir</label>
+            <input type="date" name="tanggal_lahir" class="w-full p-2 border rounded"
+                value="{{ old('tanggal_lahir', $supir->tanggal_lahir ?? '') }}">
         </div>
 
         <!-- Jenis Kelamin -->
         <div>
-          <label class="block font-semibold mb-1">Jenis Kelamin</label>
-          <select name="jenis_kelamin" class="w-full p-2 border rounded">
-            <option value="">-- Pilih Jenis Kelamin --</option>
-            <option value="pria">Pria</option>
-            <option value="wanita">Wanita</option>
-          </select>
+            <label class="block font-semibold mb-1">Jenis Kelamin</label>
+            <select name="jenis_kelamin" class="w-full p-2 border rounded">
+                <option value="">-- Pilih Jenis Kelamin --</option>
+                <option value="pria" {{ old('jenis_kelamin', $supir->jenis_kelamin ?? '') == 'pria' ? 'selected' : '' }}>Pria</option>
+                <option value="wanita" {{ old('jenis_kelamin', $supir->jenis_kelamin ?? '') == 'wanita' ? 'selected' : '' }}>Wanita</option>
+            </select>
         </div>
 
         <!-- No Telepon -->
         <div>
-          <label class="block font-semibold mb-1">No. Telepon</label>
-          <input type="text" name="no_telepon" class="w-full p-2 border rounded" placeholder="Contoh: 081234567890">
+            <label class="block font-semibold mb-1">No. Telepon</label>
+            <input type="text" name="no_telepon" class="w-full p-2 border rounded"
+                value="{{ old('no_telepon', $supir->no_telepon ?? '') }}"
+                placeholder="Contoh: 081234567890">
         </div>
 
         <!-- Alamat -->
         <div>
-          <label class="block font-semibold mb-1">Alamat</label>
-          <textarea name="alamat" rows="3" class="w-full p-2 border rounded" placeholder="Alamat lengkap"></textarea>
+            <label class="block font-semibold mb-1">Alamat</label>
+            <textarea name="alamat" rows="3" class="w-full p-2 border rounded"
+                placeholder="Alamat lengkap">{{ old('alamat', $supir->alamat ?? '') }}</textarea>
         </div>
 
         <!-- NIK -->
         <div>
-          <label class="block font-semibold mb-1">NIK</label>
-          <input type="text" name="nik" class="w-full p-2 border rounded" placeholder="Nomor Induk Kependudukan">
+            <label class="block font-semibold mb-1">NIK</label>
+            <input type="text" name="nik" class="w-full p-2 border rounded"
+                value="{{ old('nik', $supir->nik ?? '') }}"
+                placeholder="Nomor Induk Kependudukan">
         </div>
 
         <!-- Status -->
         <div>
-          <label class="block font-semibold mb-1">Status</label>
-          <select name="status" class="w-full p-2 border rounded">
-            <option value="tersedia" selected>Tersedia</option>
-            <option value="bertugas">Bertugas</option>
-          </select>
+            <label class="block font-semibold mb-1">Status</label>
+            <select name="status" class="w-full p-2 border rounded">
+                <option value="tersedia" {{ old('status', $supir->status ?? '') == 'tersedia' ? 'selected' : '' }}>Tersedia</option>
+                <option value="bertugas" {{ old('status', $supir->status ?? '') == 'bertugas' ? 'selected' : '' }}>Bertugas</option>
+            </select>
         </div>
 
         <!-- Tombol -->
         <div class="flex justify-end space-x-4">
-          <button type="reset" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Reset</button>
-          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Simpan</button>
+            <a href="{{ route('superadmin.supir') }}" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Batal</a>
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Simpan</button>
         </div>
-
-      </form>
-    </div>
-  </main>
-
-  <!-- Load Sidebar -->
-  <script>
-    fetch('sidebar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('sidebar-container').innerHTML = html;
-      })
-      .catch(err => console.error('Gagal memuat sidebar:', err));
-  </script>
-
-</body>
-</html>
+    </form>
+</div>
+@endsection

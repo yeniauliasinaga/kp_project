@@ -1,74 +1,59 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Data Tiket Pesawat</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex min-h-screen">
+@extends('layouts.app')
 
-  <!-- Sidebar -->
-  <aside id="sidebar-container" class="w-60"></aside>
+@section('content')
+<div class="p-6">
+    <h2 class="text-2xl font-bold text-green-700 mb-6">Data Tiket Pesawat</h1>
 
-  <!-- Main -->
-  <main class="flex-1 p-6 overflow-auto">
-    <h1 class="text-2xl font-bold text-green-700 mb-6">Data Tiket Pesawat</h1>
+      <div class="mb-4 flex justify-between items-center">
+        <!-- Filter Unit -->
+        <form method="GET" action="{{ route('superadmin.tiketpesawat') }}" class="flex items-center gap-2">
+            <label for="unit" class="text-sm font-semibold">Filter Unit:</label>
+            <select name="unit" id="unit" onchange="this.form.submit()" class="p-2 border rounded text-sm">
+                <option value="">Semua Unit</option>
+                @foreach($unitList as $unit)
+                    <option value="{{ $unit->id }}" {{ request('unit') == $unit->id ? 'selected' : '' }}>
+                        {{ $unit->nama_unit }}
+                    </option>
+                @endforeach
+            </select>
+        </form>
 
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold">Data Tiket Pesawat</h2>
-      <div class="flex gap-3">
-        <!-- Tambah Button -->
-        <a href="../staff/form_proposal.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Berita</a>
-      </div>
+        <!-- Button Tambah -->
+        <a href="{{ route('superadmin.tiketpesawat.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Tiket Pesawat</a>
     </div>
 
-   <!-- tiket_pesawat.html -->
-    <div class="p-6">
-      <h2 class="text-xl font-bold mb-4">Data Tiket Pesawat</h2>
-      <table class="w-full table-auto bg-white shadow rounded text-sm">
+
+    <table class="w-full table-auto bg-white shadow rounded text-sm">
         <thead class="bg-gray-200">
-          <tr>
-            <th class="p-2 text-left">Pegawai</th>
-            <th class="p-2 text-left">Tujuan</th>
-            <th class="p-2 text-left">Tanggal</th>
-            <th class="p-2 text-left">Biaya</th>
-          </tr>
+            <tr>
+                <th class="p-2 text-left">Pegawai</th>
+                <th class="p-2 text-left">Unit</th>
+                <th class="p-2 text-left">Tujuan</th>
+                <th class="p-2 text-left">Tanggal</th>
+                <th class="p-2 text-left">Biaya</th>
+                <th class="p-2 text-left">Aksi</th>
+            </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="p-2">Yeni Aulia</td>
-            <td class="p-2">Jakarta</td>
-            <td class="p-2">2025-07-20</td>
-            <td class="p-2">Rp2.000.000</td>
-          </tr>
+            @forelse ($tiket as $row)
+                <tr>
+                    <td class="p-2">{{ $row->pegawai->nama ?? '-' }}</td>
+                    <td class="p-2">{{ $row->pegawai->unit->nama_unit ?? '-' }}</td>
+                    <td class="p-2">{{ $row->tujuan }}</td>
+                    <td class="p-2">{{ $row->tanggal }}</td>
+                    <td class="p-2">Rp{{ number_format($row->biaya, 0, ',', '.') }}</td>
+                    <td class="p-2">
+                        <a href="{{ route('superadmin.tiketpesawat.edit', $row->id) }}" class="text-blue-600 hover:underline">Edit</a>
+                        <form action="{{ route('superadmin.tiketpesawat.delete', $row->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin hapus?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:underline ml-2">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="6" class="p-2 text-center text-gray-500">Belum ada data tiket</td></tr>
+            @endforelse
         </tbody>
-      </table>
-    </div>
-  </main>
-
-  <!-- Load Sidebar -->
-  <script>
-    fetch('sidebar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('sidebar-container').innerHTML = html;
-      });
-  </script>
-
-  <!-- Filter Script -->
-  <script>
-    const filterSelect = document.getElementById('filterStatus');
-    const rows = document.querySelectorAll('#proposalTable tr');
-
-    filterSelect.addEventListener('change', () => {
-      const filter = filterSelect.value;
-      rows.forEach(row => {
-        const status = row.getAttribute('data-status');
-        row.style.display = (filter === 'all' || filter === status) ? '' : 'none';
-      });
-    });
-  </script>
-
-</body>
-</html>
+    </table>
+</div>
+@endsection

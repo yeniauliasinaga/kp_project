@@ -1,91 +1,104 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Form Tambah Kendaraan</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-start min-h-screen">
+@extends('layouts.app')
 
-  <!-- Sidebar -->
-  <aside id="sidebar-container" class="w-60 bg-white shadow-md p-4">
-    <!-- Sidebar akan dimuat lewat fetch -->
-  </aside>
+@section('title', isset($kendaraan) ? 'Edit Kendaraan' : 'Form Tambah Kendaraan')
 
-  <!-- Main Content -->
-  <main class="flex-1 p-10">
-    <div class="w-full max-w-4xl mx-auto bg-yellow-100 p-8 rounded-xl shadow-lg">
-      <!-- Header -->
-      <div class="mb-6 text-center">
-        <h2 class="text-xl font-bold text-green-700">Form Tambah Kendaraan</h2>
-      </div>
+@section('content')
+<div class="w-full max-w-4xl mx-auto bg-yellow-100 p-8 mt-10 rounded-xl shadow-lg">
 
-      <!-- Form -->
-      <form class="space-y-6">
+  <div class="mb-6 text-center">
+    <h2 class="text-xl font-bold text-green-700">
+      {{ isset($kendaraan) ? 'Form Edit Kendaraan' : 'Form Tambah Kendaraan' }}
+    </h2>
+  </div>
 
-        <!-- No Polisi -->
-        <div>
-          <label class="block font-semibold mb-1">No Polisi</label>
-          <input type="text" name="no_polisi" class="w-full p-2 border rounded" placeholder="Contoh: BK 1234 AB">
-        </div>
+  <form 
+    action="{{ isset($kendaraan) ? route('superadmin.kendaraan.update', $kendaraan->id) : route('superadmin.kendaraan.store') }}" 
+    method="POST" 
+    class="space-y-6"
+  >
+    @csrf
+    @if (isset($kendaraan))
+      @method('POST') {{-- bisa juga @method('PUT') kalau route-nya pakai PUT --}}
+    @endif
 
-        <!-- Merek -->
-        <div>
-          <label class="block font-semibold mb-1">Merek</label>
-          <input type="text" name="merek" class="w-full p-2 border rounded" placeholder="Contoh: Toyota">
-        </div>
-
-        <!-- Model -->
-        <div>
-          <label class="block font-semibold mb-1">Model</label>
-          <input type="text" name="model" class="w-full p-2 border rounded" placeholder="Contoh: Avanza">
-        </div>
-
-        <!-- Bahan Bakar -->
-        <div>
-          <label class="block font-semibold mb-1">Bahan Bakar</label>
-          <input type="text" name="bahan_bakar" class="w-full p-2 border rounded" placeholder="Contoh: Bensin / Solar">
-        </div>
-
-        <!-- Status Kepemilikan -->
-        <div>
-          <label class="block font-semibold mb-1">Status Kepemilikan</label>
-          <select name="status_kepemilikan" class="w-full p-2 border rounded">
-            <option value="">-- Pilih Kepemilikan --</option>
-            <option value="milik perusahaan">Milik Perusahaan</option>
-            <option value="sewa">Sewa</option>
-          </select>
-        </div>
-
-        <!-- Status -->
-        <div>
-          <label class="block font-semibold mb-1">Status</label>
-          <select name="status" class="w-full p-2 border rounded">
-            <option value="tersedia" selected>Tersedia</option>
-            <option value="digunakan">Digunakan</option>
-          </select>
-        </div>
-
-        <!-- Tombol -->
-        <div class="flex justify-end space-x-4">
-          <button type="button" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Batal</button>
-          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Simpan</button>
-        </div>
-
-      </form>
+    <!-- No Polisi -->
+    <div>
+      <label class="block font-semibold mb-1">No Polisi</label>
+      <input 
+        type="text" 
+        name="no_polisi" 
+        class="w-full p-2 border rounded" 
+        placeholder="Contoh: BK 1234 AB"
+        value="{{ old('no_polisi', $kendaraan->no_polisi ?? '') }}"
+        required
+      >
     </div>
-  </main>
 
-  <!-- Load Sidebar -->
-  <script>
-    fetch('sidebar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('sidebar-container').innerHTML = html;
-      })
-      .catch(err => console.error('Gagal memuat sidebar:', err));
-  </script>
+    <!-- Merek -->
+    <div>
+      <label class="block font-semibold mb-1">Merek</label>
+      <input 
+        type="text" 
+        name="merek" 
+        class="w-full p-2 border rounded" 
+        placeholder="Contoh: Toyota"
+        value="{{ old('merek', $kendaraan->merek ?? '') }}"
+        required
+      >
+    </div>
 
-</body>
-</html>
+    <!-- Model -->
+    <div>
+      <label class="block font-semibold mb-1">Model</label>
+      <input 
+        type="text" 
+        name="model" 
+        class="w-full p-2 border rounded" 
+        placeholder="Contoh: Avanza"
+        value="{{ old('model', $kendaraan->model ?? '') }}"
+        required
+      >
+    </div>
+
+    <!-- Bahan Bakar -->
+    <div>
+      <label class="block font-semibold mb-1">Bahan Bakar</label>
+      <input 
+        type="text" 
+        name="bahan_bakar" 
+        class="w-full p-2 border rounded" 
+        placeholder="Contoh: Bensin / Solar"
+        value="{{ old('bahan_bakar', $kendaraan->bahan_bakar ?? '') }}"
+        required
+      >
+    </div>
+
+    <!-- Status Kepemilikan -->
+    <div>
+      <label class="block font-semibold mb-1">Status Kepemilikan</label>
+      <select name="status_kepemilikan" class="w-full p-2 border rounded" required>
+        <option value="">-- Pilih Kepemilikan --</option>
+        <option value="milik perusahaan" {{ (old('status_kepemilikan', $kendaraan->status_kepemilikan ?? '') == 'milik perusahaan') ? 'selected' : '' }}>Milik Perusahaan</option>
+        <option value="sewa" {{ (old('status_kepemilikan', $kendaraan->status_kepemilikan ?? '') == 'sewa') ? 'selected' : '' }}>Sewa</option>
+      </select>
+    </div>
+
+    <!-- Status -->
+    <div>
+      <label class="block font-semibold mb-1">Status</label>
+      <select name="status" class="w-full p-2 border rounded" required>
+        <option value="tersedia" {{ (old('status', $kendaraan->status ?? '') == 'tersedia') ? 'selected' : '' }}>Tersedia</option>
+        <option value="digunakan" {{ (old('status', $kendaraan->status ?? '') == 'digunakan') ? 'selected' : '' }}>Digunakan</option>
+      </select>
+    </div>
+
+    <!-- Tombol -->
+    <div class="flex justify-end space-x-4">
+      <a href="{{ route('superadmin.kendaraan') }}" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Batal</a>
+      <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
+        {{ isset($kendaraan) ? 'Update' : 'Simpan' }}
+      </button>
+    </div>
+  </form>
+</div>
+@endsection

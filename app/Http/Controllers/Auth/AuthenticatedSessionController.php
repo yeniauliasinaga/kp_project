@@ -25,10 +25,19 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Pastikan user memiliki pegawai
+        if (!auth()->user()->pegawai) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun tidak memiliki hak akses.',
+            ]);
+        }
+        // Redirect berdasarkan role
+        return auth()->user()->pegawai->role === 'superadmin'
+            ? redirect()->route('superadmin.dashboard')
+            : redirect()->route('staff.dashboard');
     }
 
     /**
@@ -43,5 +52,17 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Get the post-login redirect path based on user role.
+     */
+    protected function redirectTo()
+    {
+        if (auth()->user()->pegawai->role === 'superadmin') {
+            return route('superadmin.dashboard');
+        }
+        
+        return route('staff.dashboard');
     }
 }

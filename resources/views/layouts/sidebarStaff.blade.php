@@ -40,4 +40,12 @@
             <span>Proposal</span>
         </a>
     </nav>
+     <!-- Tombol Logout -->
+    <form method="POST" action="{{ route('logout') }}" class="mt-auto w-full">
+        @csrf
+        <button type="submit" 
+                class="w-full text-left flex items-center space-x-2 p-2 px-10 text-red-700 hover:bg-red-100 rounded mt-6">
+            <span>Logout</span>
+        </button>
+    </form>
 </div>

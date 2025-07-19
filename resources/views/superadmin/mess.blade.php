@@ -1,74 +1,51 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar Mess</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex min-h-screen">
+@extends('layouts.app')
 
-  <!-- Sidebar -->
-  <aside id="sidebar-container" class="w-60"></aside>
+@section('title', 'Daftar Mess')
 
-  <!-- Main -->
-  <main class="flex-1 p-6 overflow-auto">
-    <h1 class="text-2xl font-bold text-green-700 mb-6">Daftar Mess</h1>
+@section('content')
+<div class="p-6">
+    <!-- <h1 class="text-2xl font-bold text-green-700 mb-6">Daftar Mess</h1> -->
 
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold">Daftar Mess</h2>
-      <div class="flex gap-3">
-        <!-- Tambah Button -->
-        <a href="../staff/form_proposal.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Berita</a>
-      </div>
+        <h2 class="text-2xl font-bold text-green-700 mb-6">Data Mess</h2>
+        <div class="flex gap-3">
+            <!-- Tombol Tambah Mess -->
+            <a href="{{ route('superadmin.datamess.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Mess</a>
+        </div>
     </div>
 
-   <!-- data_mess.html -->
-    <div class="p-6">
-      <h2 class="text-xl font-bold mb-4">Data Mess</h2>
-      <table class="w-full table-auto bg-white shadow rounded text-sm">
+    <table class="w-full table-auto bg-white shadow rounded text-sm">
         <thead class="bg-gray-200">
-          <tr>
-            <th class="p-2">Lokasi</th>
-            <th class="p-2">Nomor Kamar</th>
-            <th class="p-2">Jumlah Bed</th>
-            <th class="p-2">Status</th>
-          </tr>
+            <tr>
+                <th class="p-2 text-left">Lokasi</th>
+                <th class="p-2 text-left">Nomor Kamar</th>
+                <th class="p-2 text-left">Jumlah Bed</th>
+                <th class="p-2 text-left">Status</th>
+                <th class="p-2 text-left">Aksi</th>
+            </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="p-2">Parapat</td>
-            <td class="p-2">101</td>
-            <td class="p-2">2</td>
-            <td class="p-2 text-green-600">Tersedia</td>
-          </tr>
+            @forelse($mess as $messItem)
+            <tr>
+                <td class="p-2">{{ $messItem->lokasi }}</td>
+                <td class="p-2">{{ $messItem->nomor_kamar }}</td>
+                <td class="p-2">{{ $messItem->jumlah_bed }}</td>
+                <td class="p-2 text-{{ $messItem->status == 'tersedia' ? 'green' : 'red' }}-600 capitalize">{{ $messItem->status }}</td>
+                <td class="px-4 py-2 space-x-2">
+                    <a href="{{ route('superadmin.datamess.edit', $messItem->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
+                    <form action="{{ route('superadmin.datamess.delete', $messItem->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mess ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" class="p-4 text-center text-gray-500">Tidak ada data mess tersedia.</td>
+            </tr>
+            @endforelse
         </tbody>
-      </table>
-    </div>
-  </main>
-
-  <!-- Load Sidebar -->
-  <script>
-    fetch('sidebar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('sidebar-container').innerHTML = html;
-      });
-  </script>
-
-  <!-- Filter Script -->
-  <script>
-    const filterSelect = document.getElementById('filterStatus');
-    const rows = document.querySelectorAll('#proposalTable tr');
-
-    filterSelect.addEventListener('change', () => {
-      const filter = filterSelect.value;
-      rows.forEach(row => {
-        const status = row.getAttribute('data-status');
-        row.style.display = (filter === 'all' || filter === status) ? '' : 'none';
-      });
-    });
-  </script>
-
-</body>
-</html>
+    </table>
+</div>
+@endsection

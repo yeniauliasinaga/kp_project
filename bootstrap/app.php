@@ -11,7 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Middleware alias
+        $middleware->alias([
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
+            'can' => \App\Http\Middleware\CheckRole::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        ]);
+
+        // Middleware groups (tidak perlu mendefinisikan ulang web group)
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

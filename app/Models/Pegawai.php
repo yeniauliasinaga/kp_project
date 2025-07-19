@@ -21,9 +21,9 @@ class Pegawai extends Model
         'alamat',
     ];
 
-    public function user()
+     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
     // Relasi ke Unit

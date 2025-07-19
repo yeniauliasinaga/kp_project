@@ -10,7 +10,7 @@ class Kendaraan extends Model
     use HasFactory;
 
     protected $table = 'kendaraan';
-    protected $primaryKey = 'no_polisi';
+    protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';
 

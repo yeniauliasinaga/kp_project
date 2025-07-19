@@ -1,123 +1,81 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Daftar Berita</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex min-h-screen">
+@extends('layouts.app')
 
-  <!-- Sidebar -->
-  <aside id="sidebar-container" class="w-60"></aside>
+@section('content')
+<div class="p-6">
 
-  <!-- Main -->
-  <main class="flex-1 p-6 overflow-auto">
-    <h1 class="text-2xl font-bold text-green-700 mb-6">Daftar Berita</h1>
-
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-lg font-semibold">Daftar Berita</h2>
-      <div class="flex gap-3">
-        <!-- Filter by Status -->
-        <select id="filterStatus" class="border p-2 rounded text-sm text-gray-700">
-          <option value="all">Jenis</option>
-          <option value="positif">Positif</option>
-          <option value="negatif">Negatif</option>
-        </select>
-
-        <!-- Tambah Button -->
-        <a href="../staff/form_proposal.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Berita</a>
-      </div>
+    {{-- Title & Tombol --}}
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-green-700 mb-6">Daftar Berita</h2>
+        <a href="{{ route('superadmin.berita.create') }}" class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700">+ Tambah Berita</a>
     </div>
 
-    <!-- Tabel Berita -->
-    <div class="bg-white p-4 rounded shadow">
-      <table class="w-full text-sm text-left text-gray-700">
-        <thead class="text-xs uppercase bg-gray-100 text-gray-600">
-          <tr>
-            <th class="px-4 py-2">Gambar</th>
-            <th class="px-4 py-2">Judul</th>
-            <th class="px-4 py-2">Tanggal</th>
-            <th class="px-4 py-2">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Berita 1 -->
-          <tr class="border-b" data-status="positif">
-            <td class="px-4 py-2">
-              <img src="storage/berita/berita1.jpg" alt="Berita 1" class="w-24 h-16 object-cover rounded" />
-            </td>
-            <td class="px-4 py-2">Rapat Umum PTPN III</td>
-            <td class="px-4 py-2">2025-07-15</td>
-            <td class="px-4 py-2 space-x-2">
-              <a href="edit_berita.html?id=1" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Update</a>
-              <button onclick="hapusBerita(1)" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Delete</button>
-            </td>
-          </tr>
+    {{-- Filter & Table --}}
+    <div class="mb-6">
+        <div class="flex items-center mb-3 gap-3">
+            <select id="filterStatus" class="border p-2 rounded text-sm text-gray-700">
+                <option value="all">Semua Jenis</option>
+                <option value="positif">Positif</option>
+                <option value="negatif">Negatif</option>
+            </select>
+        </div>
 
-          <!-- Berita 2 -->
-          <tr class="border-b" data-status="positif">
-            <td class="px-4 py-2">
-              <img src="storage/berita/berita2.jpg" alt="Berita 2" class="w-24 h-16 object-cover rounded" />
-            </td>
-            <td class="px-4 py-2">CSR Sosialisasi Petani</td>
-            <td class="px-4 py-2">2025-07-13</td>
-            <td class="px-4 py-2 space-x-2">
-              <a href="edit_berita.html?id=2" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Update</a>
-              <button onclick="hapusBerita(2)" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Delete</button>
-            </td>
-          </tr>
-
-          <!-- Berita 3 -->
-          <tr class="border-b" data-status="negatif">
-            <td class="px-4 py-2">
-              <img src="storage/berita/berita3.jpg" alt="Berita 3" class="w-24 h-16 object-cover rounded" />
-            </td>
-            <td class="px-4 py-2">Kunjungan Direksi</td>
-            <td class="px-4 py-2">2025-07-10</td>
-            <td class="px-4 py-2 space-x-2">
-              <a href="tambahBerita?id=3" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Update</a>
-              <button onclick="hapusBerita(3)" class="bg-red-500 text-white px-3 py-1 text-xs rounded hover:bg-red-600">Delete</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <div class="overflow-auto">
+            <table class="w-full table-auto bg-white shadow rounded text-sm">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="p-2 text-left">Judul</th>
+                        <th class="p-2 text-left">Jenis</th>
+                        <th class="p-2 text-left">Tanggal Publikasi</th>
+                        <th class="p-2 text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($berita as $row)
+                        <tr data-status="{{ $row->jenis_berita }}">
+                            <td class="p-2">{{ $row->judul }}</td>
+                            <td class="p-2">{{ ucfirst($row->jenis_berita) }}</td>
+                            <td class="p-2">{{ $row->tanggal_publikasi }}</td>
+                            <td class="p-2">
+                                <a href="{{ route('superadmin.berita.edit', $row->id) }}" class="text-blue-600 hover:underline">Edit</a>
+                                <form action="{{ route('superadmin.berita.delete', $row->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin hapus?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:underline ml-2">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" class="p-2 text-center text-gray-500">Tidak ada berita</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
-  </main>
 
-  <!-- Sidebar Loader -->
-  <script>
-    fetch('sidebar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('sidebar-container').innerHTML = html;
-      });
-  </script>
+    {{-- Highlight 3 Berita Terbaru --}}
+    <h3 class="text-xl font-bold text-green-700 mb-4">Highlight Berita Terbaru</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach($berita->sortByDesc('tanggal_publikasi')->take(3) as $row)
+            <div class="bg-white rounded shadow p-4">
+                <img src="{{ asset('asset/img/berita/' . $row->gambar) }}" alt="Gambar Berita" class="w-full h-40 object-cover rounded mb-3">
+                <h3 class="text-lg font-bold mb-1">{{ $row->judul }}</h3>
+                <p class="text-sm text-gray-600 mb-1">Jenis: {{ ucfirst($row->jenis_berita) }}</p>
+                <p class="text-sm text-gray-600 mb-3">Tanggal: {{ $row->tanggal_publikasi }}</p>
+            </div>
+        @endforeach
+    </div>
+</div>
 
-  <!-- Filter Script -->
-  <script>
+{{-- JS Filter Table --}}
+<script>
     const filterSelect = document.getElementById('filterStatus');
-    const rows = document.querySelectorAll('tbody tr');
+    const rows = document.querySelectorAll('tbody tr[data-status]');
 
     filterSelect.addEventListener('change', () => {
-      const filter = filterSelect.value;
-      rows.forEach(row => {
-        const status = row.getAttribute('data-status');
-        row.style.display = (filter === 'all' || filter === status) ? '' : 'none';
-      });
+        const filter = filterSelect.value;
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            row.style.display = (filter === 'all' || filter === status) ? '' : 'none';
+        });
     });
-  </script>
-
-  <!-- Hapus Berita -->
-  <script>
-    function hapusBerita(id) {
-      if (confirm("Yakin ingin menghapus berita ini?")) {
-        // Logika penghapusan (simulasi)
-        alert("Berita dengan ID " + id + " dihapus (simulasi)");
-        // Contoh: bisa tambahkan AJAX atau redirect
-      }
-    }
-  </script>
-
-</body>
-</html>
+</script>
+@endsection

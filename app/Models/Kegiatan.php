@@ -1,31 +1,35 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Kegiatan extends Model
 {
     use HasFactory;
 
-    protected $table = 'kegiatan'; // ✅ Tambahkan ini agar tidak default ke 'kegiatans'
+    protected $table = 'kegiatan';
 
     protected $fillable = [
         'nama_kegiatan',
-        'unit_id',
-        'tanggal_mulai',
-        'tanggal_selesai',
-        'lokasi',
-        'deskripsi',
+        'tempat',
+        'biaya',
+        'waktu_mulai',
+        'waktu_selesai',
+        'status',
         'created_by',
     ];
 
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class);
-    }
+    protected $casts = [
+        'waktu_mulai' => 'datetime',
+        'waktu_selesai' => 'datetime',
+        'biaya' => 'decimal:2',
+    ];
 
-    public function user()
+    // Relasi ke User (pembuat kegiatan)
+    public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
     }

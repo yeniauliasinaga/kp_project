@@ -14,17 +14,21 @@
             <img src="{{ asset('asset/img/logo.png') }}" alt="PTPN Logo" class="h-12">
             <span class="font-bold text-xl">Perkebunan Nusantara</span>
         </div>
+
+        {{-- Login/Logout Navigation --}}
         <nav class="flex gap-4">
-            @if (Route::has('login'))
-                @auth
-                    <a href="{{ url('/dashboard') }}" class="text-sm font-medium text-[#222222] hover:text-[#38AB3A]">Dashboard</a>
-                @else
-                    <a href="{{ route('login') }}" class="text-sm font-medium text-[#222222] hover:text-[#38AB3A]">Login</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="text-sm font-medium text-[#222222] hover:text-[#38AB3A]">Register</a>
-                    @endif
-                @endauth
-            @endif
+            @auth
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="text-sm font-medium text-[#222222] hover:text-[#38AB3A]">
+                        Logout
+                    </button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="text-sm font-medium text-[#222222] hover:text-[#38AB3A]">
+                    Login
+                </a>
+            @endauth
         </nav>
     </header>
 

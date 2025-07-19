@@ -1,75 +1,60 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Tiket Pesawat</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-start min-h-screen">
+@extends('layouts.app')
 
-  <!-- Sidebar -->
-  <aside id="sidebar-container" class="w-60 bg-white shadow-md p-4"></aside>
+@section('content')
+<div class="w-full max-w-3xl mx-auto bg-yellow-100 p-8 mt-10 rounded-xl shadow-lg">
+    <div class="mb-6 text-center">
+        <h2 class="text-xl font-bold text-green-700">
+            {{ isset($tiket) ? 'Edit Tiket Pesawat' : 'Tambah Tiket Pesawat' }}
+        </h2>
+    </div>
 
-  <!-- Main Content -->
-  <main class="flex-1 p-10">
-    <div class="w-full max-w-3xl mx-auto bg-yellow-100 p-8 rounded-xl shadow-lg">
-      <div class="mb-6 text-center">
-        <h2 class="text-xl font-bold text-green-700">Form Tiket Pesawat</h2>
-      </div>
-
-      <form class="space-y-6" method="POST" action="/tiket-pesawat">
-        <!-- CSRF Token -->
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <form method="POST" 
+        action="{{ isset($tiket) ? route('superadmin.tiketpesawat.edit', $tiket->id) : route('superadmin.tiketpesawat.store') }}">
+        @csrf
 
         <!-- Pegawai -->
-        <div>
-          <label class="block font-semibold mb-1">Pegawai</label>
-          <select name="pegawai_id" class="w-full p-2 border rounded">
-            <option value="">-- Pilih Pegawai --</option>
-            <!-- Diisi dari backend -->
-            <option value="1">Adi Saputra</option>
-            <option value="2">Yeni Aulia</option>
-          </select>
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Pegawai</label>
+            <select name="pegawai_id" class="w-full p-2 border rounded">
+                <option value="">-- Pilih Pegawai --</option>
+                @foreach($pegawai as $p)
+                    <option value="{{ $p->id }}" {{ isset($tiket) && $tiket->pegawai_id == $p->id ? 'selected' : '' }}>
+                        {{ $p->nama }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <!-- Tujuan -->
-        <div>
-          <label class="block font-semibold mb-1">Tujuan</label>
-          <input type="text" name="tujuan" class="w-full p-2 border rounded" placeholder="Contoh: Jakarta">
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Tujuan</label>
+            <select name="tujuan" class="w-full p-2 border rounded">
+                <option value="dalam wilayah" {{ isset($tiket) && $tiket->tujuan == 'dalam wilayah' ? 'selected' : '' }}>Dalam Wilayah</option>
+                <option value="luar wilayah" {{ isset($tiket) && $tiket->tujuan == 'luar wilayah' ? 'selected' : '' }}>Luar Wilayah</option>
+            </select>
         </div>
 
         <!-- Tanggal -->
-        <div>
-          <label class="block font-semibold mb-1">Tanggal</label>
-          <input type="date" name="tanggal" class="w-full p-2 border rounded">
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Tanggal</label>
+            <input type="date" name="tanggal" class="w-full p-2 border rounded" 
+                   value="{{ isset($tiket) ? $tiket->tanggal : '' }}">
         </div>
 
         <!-- Biaya -->
-        <div>
-          <label class="block font-semibold mb-1">Biaya</label>
-          <input type="number" name="biaya" step="0.01" class="w-full p-2 border rounded" placeholder="Contoh: 1500000.00">
+        <div class="mb-4">
+            <label class="block font-semibold mb-1">Biaya</label>
+            <input type="number" name="biaya" class="w-full p-2 border rounded" 
+                   value="{{ isset($tiket) ? $tiket->biaya : '' }}" step="0.01">
         </div>
 
         <!-- Tombol -->
-        <div class="flex justify-end space-x-4">
-          <button type="reset" class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500">Reset</button>
-          <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">Simpan</button>
+        <div class="flex justify-end gap-3">
+            <a href="{{ route('superadmin.tiketpesawat') }}" class="bg-gray-400 text-white px-4 py-2 rounded">Kembali</a>
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">
+                {{ isset($tiket) ? 'Update' : 'Simpan' }}
+            </button>
         </div>
-
-      </form>
-    </div>
-  </main>
-
-  <!-- Load Sidebar -->
-  <script>
-    fetch('sidebar.html')
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById('sidebar-container').innerHTML = html;
-      })
-      .catch(err => console.error('Gagal memuat sidebar:', err));
-  </script>
-
-</body>
-</html>
+    </form>
+</div>
+@endsection

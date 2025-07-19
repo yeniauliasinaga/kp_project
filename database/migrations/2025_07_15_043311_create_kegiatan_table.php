@@ -12,15 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kegiatan', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_kegiatan');
-            $table->string('tempat');
-            $table->decimal('biaya', 12, 2);
-            $table->date('waktu_mulai');
-            $table->date('waktu_selesai');
-            $table->foreignId('created_by')->constrained('users');
-            $table->timestamps();
-        });
+        $table->id();
+        $table->string('nama_kegiatan');
+        $table->string('tempat');
+        $table->decimal('biaya', 12, 2);
+        $table->timestamp('waktu_mulai');
+        $table->timestamp('waktu_selesai');
+        $table->enum('status', ['berlangsung', 'selesai'])->default('berlangsung');
+        $table->foreignId('created_by')->constrained('users');
+        $table->timestamps();
+    });
     }
 
     /**
