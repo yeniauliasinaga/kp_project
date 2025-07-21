@@ -27,6 +27,11 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
+    public function dataMess()
+    {
+        return $this->belongsTo(data_mess::class, 'mess_id');
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('checkin_mess');

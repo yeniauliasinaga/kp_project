@@ -135,14 +135,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/tiket-pesawat/tambah', 'tiketPesawatCreate')->name('staff.tiketPesawat.create');
         Route::post('/tiket-pesawat/tambah', 'tiketPesawatStore')->name('staff.tiketPesawat.store');
         Route::get('/tiket-pesawat/edit/{id}', 'tiketPesawatEdit')->name('staff.tiketPesawat.edit');
-        Route::post('/tiket-pesawat/update/{id}', 'tiketPesawatUpdate')->name('staff.tiketPesawat.update');
+        Route::put('/tiket-pesawat/update/{id}', 'tiketPesawatUpdate')->name('staff.tiketPesawat.update');
 
         // Checkin Mess
         Route::get('/checkin-mess', 'checkinMess')->name('staff.checkinMess');
         Route::get('/checkin-mess/tambah', 'checkinMessCreate')->name('staff.checkinMess.create');
         Route::post('/checkin-mess/tambah', 'checkinMessStore')->name('staff.checkinMess.store');
         Route::get('/checkin-mess/edit/{id}', 'checkinMessEdit')->name('staff.checkinMess.edit');
-        Route::post('/checkin-mess/update/{id}', 'checkinMessUpdate')->name('staff.checkinMess.update');
+        Route::patch('/checkin-mess/update/{id}', 'checkinMessUpdate')->name('staff.checkinMess.update');
 
         // Permintaan Kendaraan
         Route::get('/permintaan-kendaraan', 'permintaanKendaraan')->name('staff.permintaankendaraan');
@@ -156,7 +156,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/hotel/tambah', 'hotelCreate')->name('staff.hotel.create');
         Route::post('/hotel/tambah', 'hotelStore')->name('staff.hotel.store');
         Route::get('/hotel/edit/{id}', 'hotelEdit')->name('staff.hotel.edit');
-        Route::post('/hotel/update/{id}', 'hotelUpdate')->name('staff.hotel.update');
+        Route::put('/hotel/update/{id}', 'hotelUpdate')->name('staff.hotel.update');
 
         // Proposal
         Route::get('/proposal', 'proposal')->name('staff.proposal');

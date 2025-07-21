@@ -46,7 +46,6 @@ class SuperadminController extends Controller
         ));
     }
 
-
     // ===================== BERITA =====================
     public function berita()
     {
@@ -61,7 +60,8 @@ class SuperadminController extends Controller
 
     public function beritaStore(Request $request)
     {
-        $data = $request->except('gambar'); // ambil semua input kecuali gambar
+        $data = $request->only(['judul', 'sumber_media', 'link', 'jenis_berita', 'tanggal_publikasi']);
+        // $data = $request->except('gambar'); // ambil semua input kecuali gambar
         $data['created_by'] = Auth::id();
 
         // handle gambar
@@ -87,7 +87,7 @@ class SuperadminController extends Controller
     public function beritaUpdate(Request $request, $id)
     {
         $berita = Berita::findOrFail($id);
-        $data = $request->except('gambar');
+        $data = $request->only(['judul', 'sumber_media', 'link', 'jenis_berita', 'tanggal_publikasi']);
 
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');

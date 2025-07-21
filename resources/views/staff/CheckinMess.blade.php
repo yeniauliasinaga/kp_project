@@ -18,18 +18,23 @@
                     <th class="p-2 text-left">Nama Tamu</th>
                     <th class="p-2 text-left">Asal</th>
                     <th class="p-2 text-left">Mess</th>
+                    <th class="p-2 text-left">Nomor Kamar</th>
+                    <th class="p-2 text-left">Jumlah Bed</th>
                     <th class="p-2 text-left">Waktu Mulai</th>
                     <th class="p-2 text-left">Waktu Selesai</th>
                     <th class="p-2 text-left">Biaya</th>
                     <th class="p-2 text-left">Aksi</th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach ($checkins as $item)
                 <tr>
                     <td class="p-2">{{ $item->nama_tamu }}</td>
                     <td class="p-2">{{ $item->asal }}</td>
                     <td class="p-2">{{ $item->mess->lokasi ?? '-' }}</td>
+                    <td class="p-2">{{ $item->mess->nomor_kamar ?? '-' }}</td>
+                    <td class="p-2">{{ $item->mess->jumlah_bed ?? '-' }}</td>
                     <td class="p-2">{{ $item->waktu_mulai }}</td>
                     <td class="p-2">{{ $item->waktu_selesai }}</td>
                     <td class="p-2">Rp{{ number_format($item->biaya, 0, ',', '.') }}</td>

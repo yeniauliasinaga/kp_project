@@ -12,6 +12,8 @@ use App\Models\PermintaanKendaraan;
 use App\Models\Kendaraan;
 use App\Models\Proposal;
 use App\Models\Supir;
+use App\Models\Unit;
+use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -57,7 +59,30 @@ class StaffController extends Controller
 
     public function beritaStore(Request $request)
     {
-        Berita::create($request->all());
+        // dd($request->all());
+
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'sumber_media' => 'required|string|max:255',
+            'link' => 'required|url',
+            'jenis_berita' => 'required|in:positif,negatif',
+            'tanggal_publikasi' => 'required|date',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
+        $data = $request->only(['judul', 'sumber_media', 'link', 'jenis_berita', 'tanggal_publikasi']);
+        $data['created_by'] = Auth::id();
+
+        // handle upload gambar
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('asset/img/berita'), $filename);
+            $data['gambar'] = $filename;
+        }
+
+        Berita::create($data);
+
         return redirect()->route('staff.berita')->with('success', 'Berita berhasil ditambahkan.');
     }
 
@@ -69,10 +94,39 @@ class StaffController extends Controller
 
     public function beritaUpdate(Request $request, $id)
     {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'sumber_media' => 'required|string|max:255',
+            'link' => 'required|url',
+            'jenis_berita' => 'required|in:positif,negatif',
+            'tanggal_publikasi' => 'required|date',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
         $berita = Berita::findOrFail($id);
-        $berita->update($request->all());
+        $data = $request->only(['judul', 'sumber_media', 'link', 'jenis_berita', 'tanggal_publikasi']);
+
+        if ($request->hasFile('gambar')) {
+            $file = $request->file('gambar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('asset/img/berita'), $filename);
+
+            // Hapus gambar lama jika ada
+            $oldPath = public_path('asset/img/berita/' . $berita->gambar);
+            if (file_exists($oldPath)) {
+                unlink($oldPath);
+            }
+
+            $data['gambar'] = $filename;
+        } else {
+            $data['gambar'] = $berita->gambar;
+        }
+
+        $berita->update($data);
+
         return redirect()->route('staff.berita')->with('success', 'Berita berhasil diperbarui.');
     }
+
 
     // ================= KEGIATAN =================
     public function kegiatan()
@@ -131,60 +185,129 @@ class StaffController extends Controller
 
 
     // ================= TIKET PESAWAT =================
-    public function tiketPesawat()
+    public function tiketPesawat(Request $request)
     {
-        $tiket = TiketPesawat::latest()->get();
-        return view('staff.tiketPesawat', compact('tiket'));
+        // Ambil semua unit untuk dropdown filter
+        $unitOptions = Unit::all();
+
+        // Query dengan relasi pegawai dan unit
+        $query = TiketPesawat::with('pegawai.unit');
+
+        // Filter jika ada permintaan unit_id
+        if ($request->filled('unit_id')) {
+            $query->whereHas('pegawai', function ($q) use ($request) {
+                $q->where('unit_id', $request->unit_id);
+            });
+        }
+
+        return view('staff.tiketPesawat', [
+            'tiketPesawat' => $query->latest()->get(),
+            'unitOptions' => $unitOptions,
+        ]);
     }
+
 
     public function tiketPesawatCreate()
     {
-        return view('staff.tambahTiketPesawat');
+        $pegawai = Pegawai::all();
+        return view('staff.tambahTiketPesawat', compact('pegawai'));
     }
 
     public function tiketPesawatStore(Request $request)
     {
-        TiketPesawat::create($request->all());
-        return redirect()->route('staff.tiketPesawat')->with('success', 'Tiket pesawat berhasil ditambahkan.');
+        $request->validate([
+            'pegawai_id' => 'required',
+            'tujuan' => 'required',
+            'tanggal' => 'required|date',
+            'biaya' => 'required|numeric',
+        ]);
+
+        TiketPesawat::create([
+            'pegawai_id' => $request->pegawai_id,
+            'tujuan' => $request->tujuan,
+            'tanggal' => $request->tanggal,
+            'biaya' => $request->biaya,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('staff.tiketPesawat')->with('success', 'Data berhasil disimpan');
+    }
+
+    public function tiketPesawatUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'pegawai_id' => 'required',
+            'tujuan' => 'required',
+            'tanggal' => 'required|date',
+            'biaya' => 'required|numeric',
+        ]);
+
+        $tiket = TiketPesawat::findOrFail($id);
+        $tiket->update([
+            'pegawai_id' => $request->pegawai_id,
+            'tujuan' => $request->tujuan,
+            'tanggal' => $request->tanggal,
+            'biaya' => $request->biaya,
+            'updated_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('staff.tiketPesawat')->with('success', 'Data berhasil diupdate');
     }
 
     public function tiketPesawatEdit($id)
     {
         $tiket = TiketPesawat::findOrFail($id);
-        return view('staff.tambahTiketPesawat', compact('tiket'));
-    }
-
-    public function tiketPesawatUpdate(Request $request, $id)
-    {
-        $tiket = TiketPesawat::findOrFail($id);
-        $tiket->update($request->all());
-        return redirect()->route('staff.tiketPesawat')->with('success', 'Tiket pesawat berhasil diperbarui.');
+        $pegawai = Pegawai::all();
+        return view('staff.tambahTiketPesawat', compact('tiket', 'pegawai'));
     }
 
     // ================= CHECK-IN MESS =================
     public function checkinMess()
     {
-        $checkins = CheckinMess::latest()->get();
+        $checkins = CheckinMess::with('mess')->latest()->get();
         return view('staff.CheckinMess', compact('checkins'));
     }
 
     public function checkinMessCreate()
     {
-        $dataMess = DataMess::distinct()->get(); // atau tambahkan unique if needed
+        // Ambil semua kamar yang tersedia
+        $dataMess = DataMess::where('status', 'tersedia')->get();
         return view('staff.tambahCheckin', compact('dataMess'));
-    }
-
-    public function checkinMessEdit($id)
-    {
-        $checkin = CheckinMess::findOrFail($id);
-        $dataMess = DataMess::distinct()->get();
-        return view('staff.tambahCheckin', compact('checkin', 'dataMess'));
     }
 
     public function checkinMessStore(Request $request)
     {
-        CheckinMess::create($request->all());
-        return redirect()->route('staff.checkinMess')->with('success', 'Check-in berhasil ditambahkan.');
+        $request->validate([
+            'mess_id' => 'required|exists:data_mess,id',
+            'nama_tamu' => 'required|string',
+            'asal' => 'required|string',
+            'waktu_mulai' => 'required|date',
+            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
+            'biaya' => 'required|numeric',
+        ]);
+
+        CheckinMess::create([
+            'mess_id' => $request->mess_id,
+            'nama_tamu' => $request->nama_tamu,
+            'asal' => $request->asal,
+            'waktu_mulai' => $request->waktu_mulai,
+            'waktu_selesai' => $request->waktu_selesai,
+            'biaya' => $request->biaya,
+            'created_by' => Auth::id(),
+        ]);
+
+        // Ubah status kamar jadi terpakai
+        DataMess::where('id', $request->mess_id)->update(['status' => 'terpakai']);
+
+        return redirect()->route('staff.checkinMess')->with('success', 'Check-in berhasil.');
+    }
+
+    public function checkinMessEdit($id)
+    {
+        $checkin = CheckinMess::with('mess')->findOrFail($id);
+        $dataMess = DataMess::where('status', 'tersedia')->orWhere('id', $checkin->mess_id)->get();
+
+        return view('staff.tambahCheckin', compact('checkin', 'dataMess'));
     }
 
     public function checkinMessUpdate(Request $request, $id)
@@ -243,28 +366,60 @@ class StaffController extends Controller
     }
 
     // ================= HOTEL =================
-    public function hotel()
+   public function hotel()
     {
-        $hotels = Hotel::latest()->get();
-        return view('staff.hotel', compact('hotels'));
+        $query = Hotel::with(['pegawai', 'unit']);
+
+        if (request()->filled('unit')) {
+            $query->where('unit_id', request()->unit);
+        }
+
+        $hotels = $query->latest()->get();
+        $units = Unit::all();
+
+        return view('staff.hotel', compact('hotels', 'units'));
     }
 
     public function hotelCreate()
     {
-        return view('staff.tambahHotel');
+        $pegawais = Pegawai::all();
+        $units = Unit::all();
+        return view('staff.tambahHotel', compact('pegawais', 'units'));
     }
 
     public function hotelStore(Request $request)
     {
-        Hotel::create($request->all());
-        return redirect()->route('staff.hotel')->with('success', 'Hotel berhasil ditambahkan.');
+         $request->validate([
+        'pegawai_id'     => 'required|exists:pegawai,id',
+        'nama_hotel'     => 'required|string|max:255',
+        'unit_id'        => 'required|exists:unit,id',
+        'biaya'          => 'required|numeric',
+        'tanggal_masuk'  => 'required|date',
+        'tanggal_keluar' => 'nullable|date|after_or_equal:tanggal_masuk',
+    ]);
+
+    Hotel::create([
+        'pegawai_id'     => $request->pegawai_id,
+        'nama_hotel'     => $request->nama_hotel,
+        'unit_id'        => $request->unit_id,
+        'biaya'          => $request->biaya,
+        'tanggal_masuk'  => $request->tanggal_masuk,
+        'tanggal_keluar' => $request->tanggal_keluar,
+        'created_by'     => Auth::id(), // ⬅️ Wajib untuk hindari error 1364
+    ]);
+
+    return redirect()->route('staff.hotel')->with('success', 'Data hotel berhasil disimpan.');
+
     }
 
     public function hotelEdit($id)
     {
         $hotel = Hotel::findOrFail($id);
-        return view('staff.tambahHotel', compact('hotel'));
+        $pegawais = Pegawai::all();
+        $units = Unit::all();
+        return view('staff.tambahHotel', compact('hotel', 'pegawais', 'units'));
     }
+
 
     public function hotelUpdate(Request $request, $id)
     {
@@ -287,7 +442,15 @@ class StaffController extends Controller
 
     public function proposalStore(Request $request)
     {
-        Proposal::create($request->all());
+        Proposal::create([
+        'nama_instansi'     => $request->nama_instansi,
+        'disposisi'         => $request->disposisi,
+        'nilai_bantuan'     => $request->nilai_bantuan,
+        'tanggal_proposal'  => $request->tanggal_proposal,
+        'deskripsi'         => $request->deskripsi,
+        'created_by'        => auth()->id(), 
+    ]);
+
         return redirect()->route('staff.proposal')->with('success', 'Proposal berhasil ditambahkan.');
     }
 
@@ -303,4 +466,5 @@ class StaffController extends Controller
         $proposal->update($request->all());
         return redirect()->route('staff.proposal')->with('success', 'Proposal berhasil diperbarui.');
     }
+
 }
