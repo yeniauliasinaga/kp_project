@@ -20,8 +20,8 @@
         </div>
 
         <div class="overflow-auto">
-            <table class="w-full table-auto bg-white shadow rounded text-sm">
-                <thead class="bg-gray-200">
+            <table class="w-full table-auto bg-white shadow rounded text-sm ">
+                <thead class="bg-gray-200 text-left text-green-900">
                     <tr>
                         <th class="p-2 text-left">Judul</th>
                         <th class="p-2 text-left">Jenis</th>

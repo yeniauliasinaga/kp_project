@@ -26,7 +26,7 @@
   {{-- Tabel Tiket Pesawat --}}
   <div class="bg-white shadow rounded overflow-x-auto">
     <table class="w-full text-sm">
-      <thead class="bg-gray-200">
+      <thead class="bg-gray-200 text-left text-green-900 text-sm">
         <tr>
           <th class="p-3 text-left">Pegawai</th>
           <th class="p-3 text-left">Unit</th>

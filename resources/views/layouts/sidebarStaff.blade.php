@@ -8,35 +8,35 @@
     <!-- Menu Navigasi -->
     <nav class="w-full space-y-1 text-sm">
         <a href="{{ route('staff.dashboard') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.dashboard') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.dashboard') ? 'bg-gray-300' : '' }}">
             <span>Dashboard</span>
         </a>
         <a href="{{ route('staff.permintaankendaraan') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.permintaankendaraan*') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.permintaankendaraan*') ? 'bg-gray-300' : '' }}">
             <span>Permintaan Kendaraan</span>
         </a>
         <a href="{{ route('staff.kegiatan') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.kegiatan*') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.kegiatan*') ? 'bg-gray-300' : '' }}">
             <span>Kegiatan</span>
         </a>
         <a href="{{ route('staff.checkinMess') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.checkinMess*') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.checkinMess*') ? 'bg-gray-300' : '' }}">
             <span>Checkin Mess</span>
         </a>
         <a href="{{ route('staff.hotel') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.hotel*') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.hotel*') ? 'bg-gray-300' : '' }}">
             <span>Hotel</span>
         </a>
         <a href="{{ route('staff.tiketPesawat') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.tiketPesawat*') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.tiketPesawat*') ? 'bg-gray-300' : '' }}">
             <span>Tiket Pesawat</span>
         </a>
         <a href="{{ route('staff.berita') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-gray-300 rounded {{ request()->routeIs('staff.berita*') ? 'bg-gray-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.berita*') ? 'bg-gray-300' : '' }}">
             <span>Berita</span>
         </a>
         <a href="{{ route('staff.proposal') }}" 
-           class="flex items-center space-x-2 p-2 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.proposal*') ? 'bg-yellow-300' : '' }}">
+           class="flex items-center space-x-2 p-2 px-10 hover:bg-yellow-300 rounded {{ request()->routeIs('staff.proposal*') ? 'bg-gray-300' : '' }}">
             <span>Proposal</span>
         </a>
     </nav>

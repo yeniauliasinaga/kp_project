@@ -32,7 +32,17 @@ class StaffController extends Controller
 
         // Kegiatan yang sedang berlangsung
         $acaraBerlangsung = Kegiatan::where('status', 'berlangsung')->count();
-        $acaraList = Kegiatan::orderBy('waktu_mulai', 'desc')->take(10)->get();
+        $acaraList = Kegiatan::where('status', 'berlangsung')
+            ->orderBy('waktu_mulai', 'desc')
+            ->take(10)
+            ->get();
+
+        // Kegiatan yang akan datang
+        $acaraBerikut = Kegiatan::where('status', 'akan_datang')->count();
+        $kegiatanList = Kegiatan::where('status', 'akan_datang')
+            ->orderBy('waktu_mulai', 'asc')
+            ->take(10)
+            ->get();
 
         // Tambahkan query untuk berita terbaru (misal 6 berita terbaru)
         $beritaList = Berita::orderBy('tanggal_publikasi', 'desc')->take(6)->get();
@@ -40,7 +50,7 @@ class StaffController extends Controller
         return view('staff.dashboard', compact(
             'mobilTersedia', 'mobilList',
             'messTersedia', 'messList',
-            'acaraBerlangsung', 'acaraList',
+            'acaraBerlangsung','acaraBerikut', 'acaraList', 'kegiatanList',
             'beritaList'
         ));
     }
@@ -318,52 +328,107 @@ class StaffController extends Controller
     }
 
     // ================= PERMINTAAN KENDARAAN =================
-    public function permintaanKendaraan()
-    {
-        $permintaan = PermintaanKendaraan::latest()->get();
-        return view('staff.permintaankendaraan', compact('permintaan'));
+public function permintaanKendaraan()
+{
+    $permintaan = PermintaanKendaraan::latest()->get();
+    return view('staff.permintaankendaraan', compact('permintaan'));
+}
+
+public function permintaanKendaraanCreate()
+{
+    $kendaraan = Kendaraan::where('status', 'tersedia')->get();
+    $supir = Supir::where('status', 'tersedia')->get();
+    return view('staff.tambahPermintaanKendaraan', compact('kendaraan', 'supir'));
+}
+
+public function permintaanKendaraanEdit($id)
+{
+    $permintaan = PermintaanKendaraan::findOrFail($id);
+    
+    // Ambil kendaraan yang tersedia ATAU kendaraan yang sedang dipilih
+    $kendaraan = Kendaraan::where('status', 'tersedia')
+                ->orWhere('no_polisi', $permintaan->no_polisi)
+                ->get();
+                
+    // Ambil supir yang tersedia ATAU supir yang sedang dipilih
+    $supir = Supir::where('status', 'tersedia')
+            ->orWhere('id', $permintaan->supir_id)
+            ->get();
+            
+    return view('staff.tambahPermintaanKendaraan', compact('permintaan', 'kendaraan', 'supir'));
+}
+
+public function permintaanKendaraanStore(Request $request)
+{
+    $data = $request->validate([
+        'no_polisi' => 'required',
+        'supir_id' => 'required',
+        'status_kepemilikan' => 'required',
+        'jadwal_berangkat' => 'required|date',
+        'jadwal_pulang' => 'required|date|after_or_equal:jadwal_berangkat',
+        'tujuan' => 'required',
+    ]);
+
+    // Cek apakah kendaraan dan supir masih tersedia
+    $kendaraan = Kendaraan::where('no_polisi', $request->no_polisi)
+                  ->where('status', 'tersedia')
+                  ->firstOrFail();
+                  
+    $supir = Supir::where('id', $request->supir_id)
+            ->where('status', 'tersedia')
+            ->firstOrFail();
+
+    // Simpan permintaan kendaraan
+    $permintaan = PermintaanKendaraan::create($data);
+
+    // Update status supir jadi "bertugas"
+    $supir->update(['status' => 'bertugas']);
+
+    // Update status kendaraan jadi "digunakan"
+    $kendaraan->update(['status' => 'digunakan']);
+
+    return redirect()->route('staff.permintaankendaraan')->with('success', 'Permintaan berhasil ditambahkan.');
+}
+
+public function permintaanKendaraanUpdate(Request $request, $id)
+{
+    $permintaan = PermintaanKendaraan::findOrFail($id);
+    
+    $data = $request->validate([
+        'no_polisi' => 'required',
+        'supir_id' => 'required',
+        'status_kepemilikan' => 'required',
+        'jadwal_berangkat' => 'required|date',
+        'jadwal_pulang' => 'required|date|after_or_equal:jadwal_berangkat',
+        'tujuan' => 'required',
+    ]);
+    
+    // Jika no_polisi berubah
+    if ($permintaan->no_polisi != $request->no_polisi) {
+        // Kembalikan status kendaraan lama ke tersedia
+        Kendaraan::where('no_polisi', $permintaan->no_polisi)
+            ->update(['status' => 'tersedia']);
+            
+        // Update status kendaraan baru ke digunakan
+        Kendaraan::where('no_polisi', $request->no_polisi)
+            ->update(['status' => 'digunakan']);
     }
-
-    public function permintaanKendaraanCreate()
-    {
-        $kendaraan = Kendaraan::where('status', 'tersedia')->get();
-        $supir = Supir::all();
-        return view('staff.tambahPermintaanKendaraan', compact('kendaraan', 'supir'));
+    
+    // Jika supir berubah
+    if ($permintaan->supir_id != $request->supir_id) {
+        // Kembalikan status supir lama ke tersedia
+        Supir::where('id', $permintaan->supir_id)
+            ->update(['status' => 'tersedia']);
+            
+        // Update status supir baru ke bertugas
+        Supir::where('id', $request->supir_id)
+            ->update(['status' => 'bertugas']);
     }
-
-    public function permintaanKendaraanEdit($id)
-    {
-        $permintaan = PermintaanKendaraan::findOrFail($id);
-        $kendaraan = Kendaraan::all();
-        $supir = Supir::all();
-        return view('staff.tambahPermintaanKendaraan', compact('permintaan', 'kendaraan', 'supir'));
-    }
-
-    public function permintaanKendaraanStore(Request $request)
-    {
-        $validated = $request->validate([
-            'no_polisi' => 'required',
-            'supir_id' => 'required|exists:supir,id',
-            'status_kepemilikan' => 'required|in:milik perusahaan,sewa',
-            'jadwal_berangkat' => 'required|date',
-            'jadwal_pulang' => 'required|date',
-            'tujuan' => 'required|in:dalam wilayah,luar wilayah',
-        ]);
-
-        $validated['created_by'] = auth()->user()->id;
-
-        PermintaanKendaraan::create($validated);
-
-        return redirect()->route('staff.permintaankendaraan')->with('success', 'Permintaan kendaraan berhasil ditambahkan.');
-    }
-
-
-    public function permintaanKendaraanUpdate(Request $request, $id)
-    {
-        $permintaan = PermintaanKendaraan::findOrFail($id);
-        $permintaan->update($request->all());
-        return redirect()->route('staff.permintaankendaraan')->with('success', 'Permintaan berhasil diperbarui.');
-    }
+    
+    $permintaan->update($data);
+    
+    return redirect()->route('staff.permintaankendaraan')->with('success', 'Permintaan berhasil diperbarui.');
+}
 
     // ================= HOTEL =================
    public function hotel()

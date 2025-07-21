@@ -14,9 +14,13 @@
       <h2 class="text-lg font-semibold text-gray-700">Mess Tersedia</h2>
       <p class="text-3xl font-bold text-green-600">{{ $messTersedia }}</p>
     </div>
-    <div onclick="toggleTable('acara')" class="bg-white p-4 rounded-lg shadow cursor-pointer hover:bg-green-50">
+    <div onclick="toggleTable('acara-berlangsung')" class="bg-white p-4 rounded-lg shadow cursor-pointer hover:bg-green-50">
       <h2 class="text-lg font-semibold text-gray-700">Acara Berlangsung</h2>
       <p class="text-3xl font-bold text-green-600">{{ $acaraBerlangsung }}</p>
+    </div>
+    <div onclick="toggleTable('acara-akan')" class="bg-white p-4 rounded-lg shadow cursor-pointer hover:bg-green-50">
+      <h2 class="text-lg font-semibold text-gray-700">Acara Akan Datang</h2>
+      <p class="text-3xl font-bold text-green-600">{{ $kegiatanList->count() }}</p>
     </div>
   </div>
 
@@ -75,8 +79,8 @@
     </table>
   </div>
 
-  <!-- Detail Table Acara -->
-  <div id="table-acara" class="hidden bg-white rounded-lg p-4 mb-6 shadow">
+  <!-- Detail Table Acara Berlangsung-->
+  <div id="table-acara-berlangsung" class="hidden bg-white rounded-lg p-4 mb-6 shadow">
     <h2 class="text-lg font-semibold mb-2">Acara Berlangsung</h2>
     <table class="w-full text-sm table-auto">
       <thead>
@@ -99,6 +103,31 @@
       </tbody>
     </table>
   </div>
+  <!-- Detail Table Acara Akan Datang-->
+  <div id="table-acara-akan" class="hidden bg-white rounded-lg p-4 mb-6 shadow">
+    <h2 class="text-lg font-semibold mb-2">Acara Akan Datang</h2>
+    <table class="w-full text-sm table-auto">
+      <thead>
+        <tr class="bg-gray-200 text-left">
+          <th class="p-2">Nama Kegiatan</th>
+          <th class="p-2">Tempat</th>
+          <th class="p-2">Waktu</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse ($kegiatanList as $kegiatan)
+          <tr>
+            <td class="p-2">{{ $kegiatan->nama_kegiatan }}</td>
+            <td class="p-2">{{ $kegiatan->tempat }}</td>
+            <td class="p-2">{{ \Carbon\Carbon::parse($kegiatan->waktu_mulai)->translatedFormat('d F Y') }}</td>
+          </tr>
+        @empty
+          <tr><td colspan="3" class="p-2 text-center text-gray-500">Tidak ada acara</td></tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+
 
   <!-- === Carousel Berita === -->
   <div x-data="{ activeSlide: 0 }" class="mt-10">
@@ -140,10 +169,14 @@
 @push('scripts')
 <script>
   function toggleTable(id) {
-    ['mobil', 'mess', 'acara'].forEach(name => {
-      document.getElementById('table-' + name).classList.add('hidden');
-    });
-    document.getElementById('table-' + id).classList.toggle('hidden');
-  }
+  const allTables = ['mobil', 'mess', 'acara-berlangsung', 'acara-akan'];
+  allTables.forEach(name => {
+    const el = document.getElementById('table-' + name);
+    if (el) el.classList.add('hidden');
+  });
+
+  const target = document.getElementById('table-' + id);
+  if (target) target.classList.toggle('hidden');
+}
 </script>
 @endpush

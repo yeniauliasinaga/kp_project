@@ -24,7 +24,7 @@
 
   <div class="overflow-x-auto">
     <table class="min-w-full bg-white shadow rounded text-sm">
-      <thead class="bg-gray-200">
+      <thead class="bg-gray-200 text-left text-green-900 text-sm">
         <tr>
           <th class="p-2 text-left">Pegawai</th>
           <th class="p-2 text-left">Hotel</th>

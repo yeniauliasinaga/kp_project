@@ -2,10 +2,10 @@
 
 @section('content')
 <div class="p-6">
-    <h1 class="text-2xl font-bold text-green-700 mb-6">Daftar Check-In Mess</h1>
+    <!-- <h1 class="text-2xl font-bold text-green-700 mb-6">Daftar Check-In Mess</h1> -->
 
     <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold">Check-In Tamu</h2>
+        <h2 class="text-2xl font-bold text-green-700 mb-6">Check-In Tamu</h2>
         <div class="flex gap-3">
             <a href="{{ route('staff.checkinMess.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">+ Tambah Check-In</a>
         </div>
@@ -13,7 +13,7 @@
 
     <div class="bg-white rounded-xl p-4 shadow">
         <table class="w-full table-auto text-sm">
-            <thead class="bg-gray-200">
+            <thead class="bg-gray-200 text-left text-green-900 text-sm  ">
                 <tr>
                     <th class="p-2 text-left">Nama Tamu</th>
                     <th class="p-2 text-left">Asal</th>

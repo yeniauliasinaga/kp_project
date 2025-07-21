@@ -19,7 +19,7 @@
 
     <div class="bg-white rounded-xl p-4 shadow">
         <table class="w-full table-auto text-sm">
-            <thead class="bg-gray-200">
+            <thead class="bg-gray-200 text-left text-green-900 text-sm">
                 <tr>
                     <th class="p-2 text-left">Instansi</th>
                     <th class="p-2 text-left">Disposisi</th>
