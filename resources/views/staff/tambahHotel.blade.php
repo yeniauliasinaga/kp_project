@@ -18,11 +18,12 @@
     {{-- Pegawai --}}
     <div>
       <label class="block font-semibold mb-1">Pegawai</label>
-      <select name="pegawai_id" class="w-full p-2 border rounded" required>
+      <select name="pegawai_id" id="pegawai_id" class="w-full p-2 border rounded" required>
         <option value=""> Pilih Pegawai </option>
         @foreach ($pegawais as $pegawai)
           <option value="{{ $pegawai->id }}" 
-            {{ old('pegawai_id', $hotel->pegawai_id ?? '') == $pegawai->id ? 'selected' : '' }}>
+                  data-unit="{{ $pegawai->unit_id }}"
+                  {{ old('pegawai_id', $hotel->pegawai_id ?? '') == $pegawai->id ? 'selected' : '' }}>
             {{ $pegawai->nama }}
           </option>
         @endforeach
@@ -40,11 +41,11 @@
     {{-- Unit --}}
     <div>
       <label class="block font-semibold mb-1">Unit/Divisi</label>
-      <select name="unit_id" class="w-full p-2 border rounded" required>
+      <select name="unit_id" id="unit_id" class="w-full p-2 border rounded" required>
         <option value=""> Pilih Unit </option>
         @foreach ($units as $unit)
           <option value="{{ $unit->id }}" 
-            {{ old('unit_id', $hotel->unit_id ?? '') == $unit->id ? 'selected' : '' }}>
+                  {{ old('unit_id', $hotel->unit_id ?? '') == $unit->id ? 'selected' : '' }}>
             {{ $unit->nama_unit }}
           </option>
         @endforeach
@@ -81,4 +82,26 @@
     </div>
   </form>
 </div>
+
+{{-- JavaScript untuk auto update unit_id berdasarkan pegawai --}}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const pegawaiSelect = document.getElementById('pegawai_id');
+    const unitSelect = document.getElementById('unit_id');
+
+    pegawaiSelect.addEventListener('change', function () {
+      const selectedOption = this.options[this.selectedIndex];
+      const unitId = selectedOption.getAttribute('data-unit');
+
+      if (unitId) {
+        unitSelect.value = unitId;
+      }
+    });
+
+    // Trigger change saat halaman load agar unit_id terisi jika sedang edit
+    if (pegawaiSelect.value) {
+      pegawaiSelect.dispatchEvent(new Event('change'));
+    }
+  });
+</script>
 @endsection

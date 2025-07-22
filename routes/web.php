@@ -149,7 +149,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/permintaan-kendaraan/tambah', 'permintaanKendaraanCreate')->name('staff.permintaankendaraan.create');
         Route::post('/permintaan-kendaraan/tambah', 'permintaanKendaraanStore')->name('staff.permintaankendaraan.store');
         Route::get('/permintaan-kendaraan/edit/{id}', 'permintaanKendaraanEdit')->name('staff.permintaankendaraan.edit');
-        Route::post('/permintaan-kendaraan/update/{id}', 'permintaanKendaraanUpdate')->name('staff.permintaankendaraan.update');
+        Route::put('/permintaan-kendaraan/update/{id}', 'permintaanKendaraanUpdate')->name('staff.permintaankendaraan.update');
 
         // Hotel
         Route::get('/hotel', 'hotel')->name('staff.hotel');

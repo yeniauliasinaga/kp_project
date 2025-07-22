@@ -22,19 +22,27 @@ class PermintaanKendaraanSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 15; $i++) {
+        // Ambil tanggal mulai sebulan yang lalu
+        $startDate = Carbon::now()->subDays(30);
+
+        for ($i = 0; $i < 30; $i++) {
             $kendaraan = $kendaraans[$i % $kendaraans->count()];
             $supir = $supirs[$i % $supirs->count()];
+            
+            $jadwalBerangkat = $startDate->copy()->addDays($i);
+            $jadwalPulang = $jadwalBerangkat->copy()->addDays(rand(1, 5)); // pulang antara 1–5 hari setelahnya
 
             PermintaanKendaraan::create([
                 'supir_id' => $supir->id,
                 'no_polisi' => $kendaraan->no_polisi,
                 'status_kepemilikan' => $kendaraan->status_kepemilikan,
-                'jadwal_berangkat' => Carbon::now()->addDays($i),
-                'jadwal_pulang' => Carbon::now()->addDays($i + 2),
+                'jadwal_berangkat' => $jadwalBerangkat,
+                'jadwal_pulang' => $jadwalPulang,
                 'tujuan' => $i % 2 === 0 ? 'dalam wilayah' : 'luar wilayah',
                 'created_by' => $user->id,
             ]);
         }
+
+        $this->command->info("✅ Seeder PermintaanKendaraan berhasil dibuat dari 30 hari lalu sampai hari ini.");
     }
 }

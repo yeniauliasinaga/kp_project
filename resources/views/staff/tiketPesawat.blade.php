@@ -6,16 +6,17 @@
 
   {{-- Dropdown Filter --}}
   <div class="flex justify-between items-center mb-4">
-    <form action="{{ route('staff.tiketPesawat') }}" method="GET" id="filterForm">
-      <select name="unit" id="unitSelect" class="border px-3 py-2 rounded text-sm">
-        <option value=""> Semua Unit </option>
-        @foreach($unitOptions as $unit)
-          <option value="{{ $unit }}" {{ request('unit') == $unit -> id ? 'selected' : '' }}>
-            {{ $unit -> nama_unit }}
-          </option>
-        @endforeach
-      </select>
-    </form>
+   <form action="{{ route('staff.tiketPesawat') }}" method="GET" id="filterForm">
+    <select name="unit_id" id="unitSelect" class="border px-3 py-2 rounded text-sm">
+      <option value=""> Semua Unit </option>
+      @foreach($unitOptions as $unit)
+        <option value="{{ $unit->id }}" {{ request('unit_id') == $unit->id ? 'selected' : '' }}>
+          {{ $unit->nama_unit }}
+        </option>
+      @endforeach
+    </select>
+  </form>
+
 
     {{-- Tombol Tambah --}}
     <a href="{{ route('staff.tiketPesawat.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
@@ -45,7 +46,7 @@
             <td class="p-3">{{ $tiket->tanggal }}</td>
             <td class="p-3">Rp{{ number_format($tiket->biaya, 0, ',', '.') }}</td>
             <td class="p-3">
-              <a href="{{ route('staff.tiketPesawat.edit', $tiket->id) }}" class="text-blue-600 hover:underline">Edit</a>
+              <a href="{{ route('staff.tiketPesawat.edit', $tiket->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
             </td>
           </tr>
         @empty

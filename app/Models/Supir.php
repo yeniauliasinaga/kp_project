@@ -17,4 +17,10 @@ class Supir extends Model
         'nik',
         'status',
     ];
+
+    public function permintaan()
+    {
+        return $this->hasMany(PermintaanKendaraan::class, 'supir_id', 'id');
+    }
+
 }

@@ -8,6 +8,9 @@
 
     <form action="{{ isset($permintaan) ? route('staff.permintaankendaraan.update', $permintaan->id) : route('staff.permintaankendaraan.store') }}" method="POST">
         @csrf
+        @if(isset($permintaan))
+            @method('PUT')
+        @endif
 
         {{-- No Polisi --}}
         <div class="mb-4">
@@ -16,7 +19,7 @@
                 <option value=""> Pilih Kendaraan </option>
                 @foreach($kendaraan as $k)
                     <option value="{{ $k->no_polisi }}"
-                        {{ (old('no_polisi') ?? $permintaan->no_polisi ?? '') == $k->no_polisi ? 'selected' : '' }}>
+                        {{ (old('no_polisi') ?? optional($permintaan)->no_polisi) == $k->no_polisi ? 'selected' : '' }}>
                         {{ $k->no_polisi }} - {{ $k->jenis }}
                     </option>
                 @endforeach
@@ -29,10 +32,29 @@
             <select name="supir_id" id="supir_id" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm" required>
                 <option value=""> Pilih Supir </option>
                 @foreach($supir as $s)
-                    <option value="{{ $s->id }}"
-                        {{ (old('supir_id') ?? $permintaan->supir_id ?? '') == $s->id ? 'selected' : '' }}>
-                        {{ $s->nama_lengkap }}
-                    </option>
+                    @php
+                        $start = old('jadwal_berangkat') ?? optional($permintaan)->jadwal_berangkat;
+                        $end = old('jadwal_pulang') ?? optional($permintaan)->jadwal_pulang;
+                        $bentrok = \App\Models\PermintaanKendaraan::where('supir_id', $s->id)
+                            ->where('id', '!=', optional($permintaan)->id ?? 0)
+                            ->when($start && $end, function ($query) use ($start, $end) {
+                                $query->where(function ($q) use ($start, $end) {
+                                    $q->whereBetween('jadwal_berangkat', [$start, $end])
+                                      ->orWhereBetween('jadwal_pulang', [$start, $end])
+                                      ->orWhere(function ($q2) use ($start, $end) {
+                                          $q2->where('jadwal_berangkat', '<=', $start)
+                                              ->where('jadwal_pulang', '>=', $end);
+                                      });
+                                });
+                            })->exists();
+                    @endphp
+
+                    @if(!$bentrok || (optional($permintaan)->supir_id == $s->id))
+                        <option value="{{ $s->id }}"
+                            {{ (old('supir_id') ?? optional($permintaan)->supir_id) == $s->id ? 'selected' : '' }}>
+                            {{ $s->nama_lengkap }}
+                        </option>
+                    @endif
                 @endforeach
             </select>
         </div>
@@ -43,11 +65,11 @@
             <select name="status_kepemilikan" id="status_kepemilikan" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm" required>
                 <option value=""> Pilih Status </option>
                 <option value="milik perusahaan"
-                    {{ (old('status_kepemilikan') ?? $permintaan->status_kepemilikan ?? '') == 'milik perusahaan' ? 'selected' : '' }}>
+                    {{ (old('status_kepemilikan') ?? optional($permintaan)->status_kepemilikan) == 'milik perusahaan' ? 'selected' : '' }}>
                     Milik Perusahaan
                 </option>
                 <option value="sewa"
-                    {{ (old('status_kepemilikan') ?? $permintaan->status_kepemilikan ?? '') == 'sewa' ? 'selected' : '' }}>
+                    {{ (old('status_kepemilikan') ?? optional($permintaan)->status_kepemilikan) == 'sewa' ? 'selected' : '' }}>
                     Sewa
                 </option>
             </select>
@@ -57,18 +79,18 @@
         <div class="mb-4">
             <label for="jadwal_berangkat" class="block font-semibold text-gray-700">Jadwal Berangkat</label>
             <input type="datetime-local" name="jadwal_berangkat" id="jadwal_berangkat"
-                   class="w-full border-gray-300 rounded-lg shadow-sm"
-                   value="{{ old('jadwal_berangkat') ?? (isset($permintaan) ? \Carbon\Carbon::parse($permintaan->jadwal_berangkat)->format('Y-m-d\TH:i') : '') }}"
-                   required>
+                class="w-full border-gray-300 rounded-lg shadow-sm"
+                value="{{ old('jadwal_berangkat') ?? (isset($permintaan->jadwal_berangkat) ? \Carbon\Carbon::parse($permintaan->jadwal_berangkat)->format('Y-m-d\TH:i') : '') }}"
+                required>
         </div>
 
         {{-- Jadwal Pulang --}}
         <div class="mb-4">
             <label for="jadwal_pulang" class="block font-semibold text-gray-700">Jadwal Pulang</label>
             <input type="datetime-local" name="jadwal_pulang" id="jadwal_pulang"
-                   class="w-full border-gray-300 rounded-lg shadow-sm"
-                   value="{{ old('jadwal_pulang') ?? (isset($permintaan) ? \Carbon\Carbon::parse($permintaan->jadwal_pulang)->format('Y-m-d\TH:i') : '') }}"
-                   required>
+                class="w-full border-gray-300 rounded-lg shadow-sm"
+                value="{{ old('jadwal_pulang') ?? (isset($permintaan->jadwal_pulang) ? \Carbon\Carbon::parse($permintaan->jadwal_pulang)->format('Y-m-d\TH:i') : '') }}"
+                required>
         </div>
 
         {{-- Tujuan --}}
@@ -77,11 +99,11 @@
             <select name="tujuan" id="tujuan" class="w-full mt-1 border-gray-300 rounded-lg shadow-sm" required>
                 <option value=""> Pilih Tujuan </option>
                 <option value="dalam wilayah"
-                    {{ (old('tujuan') ?? $permintaan->tujuan ?? '') == 'dalam wilayah' ? 'selected' : '' }}>
+                    {{ (old('tujuan') ?? optional($permintaan)->tujuan) == 'dalam wilayah' ? 'selected' : '' }}>
                     Dalam Wilayah
                 </option>
                 <option value="luar wilayah"
-                    {{ (old('tujuan') ?? $permintaan->tujuan ?? '') == 'luar wilayah' ? 'selected' : '' }}>
+                    {{ (old('tujuan') ?? optional($permintaan)->tujuan) == 'luar wilayah' ? 'selected' : '' }}>
                     Luar Wilayah
                 </option>
             </select>

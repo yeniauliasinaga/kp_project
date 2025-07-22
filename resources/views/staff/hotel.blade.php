@@ -45,7 +45,7 @@
             <td class="p-2">{{ $hotel->tanggal_keluar }}</td>
             <td class="p-2">Rp{{ number_format($hotel->biaya, 0, ',', '.') }}</td>
             <td class="p-2">
-              <a href="{{ route('staff.hotel.edit', $hotel->id) }}" class="text-blue-600 hover:underline">Edit</a>
+              <a href="{{ route('staff.hotel.edit', $hotel->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
             </td>
           </tr>
         @empty
