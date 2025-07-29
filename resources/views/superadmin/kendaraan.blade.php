@@ -20,16 +20,16 @@
   </div>
 
   <div class="bg-white shadow rounded-xl overflow-x-auto">
-    <table class="min-w-full table-auto text-sm">
+    <table class="min-w-full table-auto text-sm text-left">
       <thead class="bg-gray-200 text-gray-700">
         <tr>
-          <th class="px-4 py-2 text-left">No Polisi</th>
-          <th class="px-4 py-2 text-left">Merek</th>
-          <th class="px-4 py-2 text-left">Model</th>
-          <th class="px-4 py-2 text-left">Bahan Bakar</th>
-          <th class="px-4 py-2 text-left">Status Kepemilikan</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Aksi</th>
+          <th class="px-4 py-2">No Polisi</th>
+          <th class="px-4 py-2">Merek</th>
+          <th class="px-4 py-2">Model</th>
+          <th class="px-4 py-2">Bahan Bakar</th>
+          <th class="px-4 py-2">Status Kepemilikan</th>
+          <th class="px-4 py-2">Status</th>
+          <th class="px-4 py-2">Aksi</th>
         </tr>
       </thead>
       <tbody id="kendaraanTable">

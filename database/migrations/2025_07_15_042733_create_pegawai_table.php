@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->unique();
             $table->string('nama');
             $table->string('nip')->unique();
+            $table->string('nrk')->unique();
             $table->string('jabatan');
             $table->enum('role', ['staff', 'superadmin']);
             $table->foreignId('unit_id')->constrained('unit');

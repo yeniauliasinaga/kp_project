@@ -36,6 +36,7 @@ class PegawaiSeeder extends Seeder
                 'role'    => 'superadmin',
                 'unit_id' => $units->first()->id,
                 'alamat'  => 'Jl. Merdeka No. 1',
+                'nrk'     => 'NRK19780515', // ← Tambahkan ini
             ]
         );
 
@@ -48,6 +49,7 @@ class PegawaiSeeder extends Seeder
         foreach ($units as $i => $unit) {
             foreach ($staffs as $j => $staffName) {
                 $nip = '19910107201411' . sprintf('%03d', $i * 10 + $j);
+                $nrk = 'NRK' . sprintf('%04d%02d', $i, $j); // Contoh format unik NRK
 
                 $email = strtolower(str_replace(' ', '.', $staffName)) . '@example.com';
                 $user = User::where('email', $email)->first();
@@ -66,6 +68,7 @@ class PegawaiSeeder extends Seeder
                         'role'    => 'staff',
                         'unit_id' => $unit->id,
                         'alamat'  => 'Jl. Unit ' . $unit->nama_unit,
+                        'nrk'     => $nrk, 
                     ]
                 );
             }

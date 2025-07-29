@@ -21,21 +21,21 @@
 
         <div class="overflow-auto">
             <table class="w-full table-auto bg-white shadow rounded text-sm">
-                <thead class="bg-gray-200">
+                <thead class="bg-white-200">
                     <tr>
-                        <th class="p-2 text-left">Judul</th>
-                        <th class="p-2 text-left">Jenis</th>
-                        <th class="p-2 text-left">Tanggal Publikasi</th>
-                        <th class="p-2 text-left">Aksi</th>
+                        <th class="p-6 text-left">Judul</th>
+                        <th class="p-6 text-left">Jenis</th>
+                        <th class="p-6 text-left">Tanggal Publikasi</th>
+                        <th class="p-6 text-left">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($berita as $row)
                         <tr data-status="{{ $row->jenis_berita }}">
-                            <td class="p-2">{{ $row->judul }}</td>
-                            <td class="p-2 text-{{ $row->jenis_berita == 'positif' ? 'green' : 'red' }}-600 capitalize">{{ ucfirst($row->jenis_berita) }}</td>
-                            <td class="p-2">{{ $row->tanggal_publikasi }}</td>
-                            <td class="p-2">
+                            <td class="p-4">{{ $row->judul }}</td>
+                            <td class="p-4 text-{{ $row->jenis_berita == 'positif' ? 'green' : 'red' }}-600 capitalize">{{ ucfirst($row->jenis_berita) }}</td>
+                            <td class="p-4">{{ $row->tanggal_publikasi }}</td>
+                            <td class="p-4">
                                 <a href="{{ route('superadmin.berita.edit', $row->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
                                 <form action="{{ route('superadmin.berita.delete', $row->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin hapus?')">
                                     @csrf @method('DELETE')

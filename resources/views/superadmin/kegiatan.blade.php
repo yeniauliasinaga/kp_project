@@ -20,7 +20,7 @@
 
     <div class="bg-white rounded-xl p-4 shadow">
         <table class="w-full table-auto text-sm">
-            <thead class="bg-gray-200">
+            <thead class="bg-white-100">
                 <tr>
                     <th class="p-2 text-left">Nama Kegiatan</th>
                     <th class="p-2 text-left">Tempat</th>
@@ -33,14 +33,14 @@
             </thead>
             <tbody id="kegiatanTable">
                 @foreach ($kegiatan as $item)
-                <tr data-status="{{ strtolower($item->status) }}">
+                <tr data-status="{{ strtolower($item->status_dinamis) }}">
                     <td class="p-2">{{ $item->nama_kegiatan }}</td>
                     <td class="p-2">{{ $item->tempat }}</td>
                     <td class="p-2">Rp{{ number_format($item->biaya, 0, ',', '.') }}</td>
                     <td class="p-2">{{ $item->waktu_mulai }}</td>
                     <td class="p-2">{{ $item->waktu_selesai }}</td>
-                    <td class="p-2 text-{{ $item->status == 'berlangsung' ? 'green' : ($item->status == 'akan_datang' ? 'blue' : 'gray') }}-600 font-medium">
-                        {{ ucfirst($item->status) }}
+                   <td class="p-2 text-{{ $item->warna_status }}-600 font-medium" data-status="{{ $item->status_dinamis }}">
+                        {{ ucfirst(str_replace('_', ' ', $item->status_dinamis)) }}
                     </td>
                     <td class="px-4 py-2 space-x-2">
                     <a href="{{ route('superadmin.kegiatan.edit', $item->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
@@ -55,8 +55,26 @@
             </tbody>
         </table>
     </div>
+    {{-- Galeri Gambar Kegiatan --}}
+<div class="mt-10">
+    <h3 class="text-xl font-bold text-green-700 mb-4">Galeri Gambar Kegiatan</h3>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        @foreach ($kegiatan->take(8) as $item)
+            @if ($item->gambar)
+                <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <img src="{{ asset('asset/img/kegiatan/' . $item->gambar) }}" alt="Gambar {{ $item->nama_kegiatan }}" class="w-full h-40 object-cover">
+                    <div class="p-3">
+                        <h4 class="font-semibold text-sm text-gray-800 truncate">{{ $item->nama_kegiatan }}</h4>
+                        <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($item->waktu_mulai)->translatedFormat('d M Y H:i') }}</p>
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    </div>
 </div>
 @endsection
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

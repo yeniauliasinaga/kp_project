@@ -17,8 +17,8 @@
       </ul>
     </div>
   @endif
-
-  <form method="POST" action="{{ isset($kegiatan) ? route('superadmin.kegiatan.update', $kegiatan->id) : route('superadmin.kegiatan.store') }}">
+  
+<form method="POST" enctype="multipart/form-data" action="{{ isset($kegiatan) ? route('superadmin.kegiatan.update', $kegiatan->id) : route('superadmin.kegiatan.store') }}">
     @csrf
     @if (isset($kegiatan))
       @method('PUT')
@@ -58,6 +58,16 @@
       <input type="number" name="biaya" class="w-full p-2 border rounded"
         value="{{ old('biaya', $kegiatan->biaya ?? '') }}" required>
     </div>
+
+    {{-- Gambar --}}
+    <div class="mb-4">
+      <label class="block font-semibold mb-1">Gambar Kegiatan</label>
+      <input type="file" name="gambar" class="w-full p-2 border rounded" {{ isset($kegiatan) ? '' : 'required' }}>
+      @if (isset($kegiatan) && $kegiatan->gambar)
+        <img src="{{ asset('img/kegiatan/' . $kegiatan->gambar) }}" class="mt-2 w-32 rounded">
+      @endif
+    </div>
+
 
     {{-- Status --}}
     <div class="mb-4">

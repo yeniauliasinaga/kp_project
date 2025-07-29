@@ -14,7 +14,7 @@
 
     <div class="p-4 bg-white shadow rounded">
         <table class="w-full table-auto text-sm">
-            <thead class="bg-gray-200">
+            <thead class="bg-white-200">
                 <tr>
                     <th class="p-2 text-left">Nama</th>
                     <th class="p-2 text-left">Tanggal Lahir</th>

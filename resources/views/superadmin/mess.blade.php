@@ -23,22 +23,22 @@
     </div>
 
     <table class="w-full table-auto bg-white shadow rounded text-sm">
-        <thead class="bg-gray-200">
+        <thead class="bg-white-200 text-center">
             <tr>
-                <th class="p-2 text-left">Lokasi</th>
-                <th class="p-2 text-left">Nomor Kamar</th>
-                <th class="p-2 text-left">Jumlah Bed</th>
-                <th class="p-2 text-left">Status</th>
-                <th class="p-2 text-left">Aksi</th>
+                <th class="p-2 px-2 py-4">Lokasi</th>
+                <th class="p-2 px-2 py-4">Nomor Kamar</th>
+                <th class="p-2 px-2 py-4">Jumlah Bed</th>
+                <th class="p-2 px-2 py-4">Status</th>
+                <th class="p-2 px-2 py-4">Aksi</th>
             </tr>
         </thead>
         <tbody>
             @forelse($mess as $messItem)
-            <tr>
-                <td class="p-2">{{ $messItem->lokasi }}</td>
-                <td class="p-2">{{ $messItem->nomor_kamar }}</td>
-                <td class="p-2">{{ $messItem->jumlah_bed }}</td>
-                <td class="p-2 text-{{ $messItem->status == 'tersedia' ? 'green' : 'red' }}-600 capitalize">{{ $messItem->status }}</td>
+            <tr class="text-center">
+                <td class="p-2 px-4">{{ $messItem->lokasi }}</td>
+                <td class="p-2 px-4">{{ $messItem->nomor_kamar }}</td>
+                <td class="p-2 px-4">{{ $messItem->jumlah_bed }}</td>
+                <td class="p-2 px-4 text-{{ $messItem->status == 'tersedia' ? 'green' : 'red' }}-600 capitalize">{{ $messItem->status }}</td>
                 <td class="px-4 py-2 space-x-2">
                     <a href="{{ route('superadmin.datamess.edit', $messItem->id) }}" class="bg-yellow-400 text-white px-3 py-1 text-xs rounded hover:bg-yellow-500">Edit</a>
                     <form action="{{ route('superadmin.datamess.delete', $messItem->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mess ini?')">

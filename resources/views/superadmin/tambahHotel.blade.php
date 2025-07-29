@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <form action="{{ isset($hotel) ? route('superadmin.hotel.update', $hotel->id) : route('superadmin.hotel.store') }}" method="POST">
+    <form action="{{ isset($hotel) ? route('superadmin.hotel.update', $hotel->id) : route('superadmin.hotel.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @if (isset($hotel))
             @method('PUT')
@@ -28,7 +28,7 @@
         <div class="mb-4">
             <label class="block font-medium mb-1">Nama Pegawai</label>
             <select name="pegawai_id" id="pegawaiSelect" class="w-full border rounded p-2" required>
-                <option value="">-- Pilih Pegawai --</option>
+                <option value="">Pilih Pegawai</option>
                 @foreach ($pegawais as $pegawai)
                     <option 
                         value="{{ $pegawai->id }}"
@@ -66,6 +66,21 @@
             <label class="block font-medium mb-1">Biaya</label>
             <input type="number" name="biaya" class="w-full border rounded p-2" required
                 value="{{ old('biaya', $hotel->biaya ?? '') }}">
+        </div>
+        {{-- Bukti Resi --}}
+        <div class="mb-4">
+            <label class="block font-medium mb-1">Upload Bukti Resi (gambar/pdf)</label>
+            <input type="file" name="bukti_resi" class="w-full border rounded p-2" accept=".jpg,.jpeg,.png,.pdf">
+            
+            @if (isset($hotel) && $hotel->bukti_resi)
+                <div class="mt-2">
+                    @if (Str::endsWith($hotel->bukti_resi, ['.jpg', '.jpeg', '.png']))
+                        <img src="{{ asset($hotel->bukti_resi) }}" alt="Bukti Resi" class="w-32 rounded shadow">
+                    @elseif (Str::endsWith($hotel->bukti_resi, '.pdf'))
+                        <a href="{{ asset($hotel->bukti_resi) }}" target="_blank" class="text-blue-600 underline">Lihat Resi PDF</a>
+                    @endif
+                </div>
+            @endif
         </div>
 
         {{-- Tanggal Masuk --}}

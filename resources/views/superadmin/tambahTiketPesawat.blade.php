@@ -16,7 +16,7 @@
         <div class="mb-4">
             <label class="block font-semibold mb-1">Pegawai</label>
             <select name="pegawai_id" class="w-full p-2 border rounded">
-                <option value="">-- Pilih Pegawai --</option>
+                <option value=""> Pilih Pegawai </option>
                 @foreach($pegawai as $p)
                     <option value="{{ $p->id }}" {{ isset($tiket) && $tiket->pegawai_id == $p->id ? 'selected' : '' }}>
                         {{ $p->nama }}
@@ -28,10 +28,8 @@
         <!-- Tujuan -->
         <div class="mb-4">
             <label class="block font-semibold mb-1">Tujuan</label>
-            <select name="tujuan" class="w-full p-2 border rounded">
-                <option value="dalam wilayah" {{ isset($tiket) && $tiket->tujuan == 'dalam wilayah' ? 'selected' : '' }}>Dalam Wilayah</option>
-                <option value="luar wilayah" {{ isset($tiket) && $tiket->tujuan == 'luar wilayah' ? 'selected' : '' }}>Luar Wilayah</option>
-            </select>
+            <input type="text" name="tujuan" class="w-full p-2 border rounded" 
+                value="{{ isset($tiket) ? $tiket->tujuan : old('tujuan') }}">
         </div>
 
         <!-- Tanggal -->

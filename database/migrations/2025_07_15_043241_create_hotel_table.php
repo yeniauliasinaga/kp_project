@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('biaya', 12, 2);
             $table->date('tanggal_masuk');
             $table->date('tanggal_keluar');
+            $table->string('bukti_resi')->comment('Nama file gambar di public/asset/img/hotel/');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();
         });

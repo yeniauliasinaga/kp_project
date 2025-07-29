@@ -13,9 +13,12 @@ use App\Models\Pegawai;
 use App\Models\Supir;
 use App\Models\Unit;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SuperadminController extends Controller
 {
@@ -23,26 +26,49 @@ class SuperadminController extends Controller
 
     public function dashboard()
     {
-        // Mobil yang tersedia (status: tersedia)
+        // Mobil
         $mobilTersedia = Kendaraan::where('status', 'tersedia')->count();
         $mobilList = Kendaraan::where('status', 'tersedia')->get();
 
-        // Mess yang tersedia (status: tersedia)
+        // Mess
         $messTersedia = DataMess::where('status', 'tersedia')->count();
         $messList = DataMess::where('status', 'tersedia')->orderBy('lokasi')->take(10)->get();
 
-        // Kegiatan yang sedang berlangsung
+        // Kegiatan
         $acaraBerlangsung = Kegiatan::where('status', 'berlangsung')->count();
         $acaraList = Kegiatan::orderBy('waktu_mulai', 'desc')->take(10)->get();
+        $acaraAkanDatang = Kegiatan::whereDate('waktu_mulai', '>', Carbon::now())
+                                    ->orderBy('waktu_mulai', 'asc')
+                                    ->take(5)->get();
 
-        // Tambahkan query untuk berita terbaru (misal 6 berita terbaru)
+        // Highlight Kegiatan (ambil yang punya gambar)
+        $highlightKegiatan = Kegiatan::whereNotNull('gambar')
+                                    ->orderBy('waktu_mulai', 'desc')
+                                    ->take(5)->get();
+
+        // Berita Terbaru
         $beritaList = Berita::orderBy('tanggal_publikasi', 'desc')->take(6)->get();
+
+        // Proposal
+        $jumlahProposalDisetujui = Proposal::where('disposisi', 'disetujui')->count();
+        $jumlahProposalDitolak = Proposal::where('disposisi', 'tidak disetujui')->count();
+        $proposalList = Proposal::orderBy('created_at', 'desc')->take(6)->get();
+
+        // Tiket Pesawat
+        $tiketPesawatList = TiketPesawat::with('pegawai')
+                                        ->orderBy('tanggal', 'desc')
+                                        ->take(6)->get();
 
         return view('superadmin.dashboard', compact(
             'mobilTersedia', 'mobilList',
             'messTersedia', 'messList',
             'acaraBerlangsung', 'acaraList',
-            'beritaList'
+            'beritaList',
+            'jumlahProposalDisetujui', 'jumlahProposalDitolak',
+            'highlightKegiatan',
+            'proposalList',
+            'acaraAkanDatang',
+            'tiketPesawatList'
         ));
     }
 
@@ -120,8 +146,32 @@ class SuperadminController extends Controller
     // ===================== KEGIATAN =====================
     public function kegiatan()
     {
-        $kegiatan = Kegiatan::latest()->get();
-        return view('superadmin.kegiatan', compact('kegiatan'));
+         // Otomatis ubah status ke "selesai" jika waktunya sudah lewat
+    Kegiatan::where('status', '!=', 'selesai')
+        ->where('waktu_selesai', '<', Carbon::now())
+        ->update(['status' => 'selesai']);
+
+    // Ambil semua kegiatan, dan hitung status dinamis
+    $kegiatan = Kegiatan::orderByDesc('waktu_mulai')->get()->map(function ($item) {
+        $now = Carbon::now();
+        $mulai = Carbon::parse($item->waktu_mulai);
+        $selesai = Carbon::parse($item->waktu_selesai);
+
+        if ($now->lt($mulai)) {
+            $item->status_dinamis = 'akan_datang';
+            $item->warna_status = 'blue';
+        } elseif ($now->between($mulai, $selesai)) {
+            $item->status_dinamis = 'berlangsung';
+            $item->warna_status = 'green';
+        } else {
+            $item->status_dinamis = 'selesai';
+            $item->warna_status = 'gray';
+        }
+
+        return $item;
+    });
+
+    return view('superadmin.kegiatan', compact('kegiatan'));
     }
 
     public function kegiatanCreate()
@@ -132,16 +182,22 @@ class SuperadminController extends Controller
     public function kegiatanStore(Request $request)
     {
         $validated = $request->validate([
-            'nama_kegiatan' => 'required|string|max:255',
-            'tempat' => 'required|string|max:255',
+            'nama_kegiatan' => 'required',
+            'tempat' => 'required',
+            'waktu_mulai' => 'required',
+            'waktu_selesai' => 'required',
             'biaya' => 'required|numeric',
-            'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
             'status' => 'required|in:akan_datang,berlangsung,selesai',
+            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $validated['created_by'] = Auth::id();
+        if ($request->hasFile('gambar')) {
+            $filename = time() . '.' . $request->gambar->extension();
+            $request->gambar->move(public_path('asset/img/kegiatan'), $filename);
+            $validated['gambar'] = $filename;
+        }
 
+        $validated['created_by'] = auth()->id();
         Kegiatan::create($validated);
 
         return redirect()->route('superadmin.kegiatan')->with('success', 'Kegiatan berhasil ditambahkan.');
@@ -156,17 +212,24 @@ class SuperadminController extends Controller
 
     public function kegiatanUpdate(Request $request, $id)
     {
-         $validated = $request->validate([
-            'nama_kegiatan' => 'required|string|max:255',
-            'tempat' => 'required|string|max:255',
+        $kegiatan = Kegiatan::findOrFail($id);
+
+        $validated = $request->validate([
+            'nama_kegiatan' => 'required',
+            'tempat' => 'required',
+            'waktu_mulai' => 'required',
+            'waktu_selesai' => 'required',
             'biaya' => 'required|numeric',
-            'waktu_mulai' => 'required|date',
-            'waktu_selesai' => 'required|date|after_or_equal:waktu_mulai',
             'status' => 'required|in:akan_datang,berlangsung,selesai',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $validated['created_by'] = Auth::id();
-        $kegiatan = Kegiatan::findOrFail($id);
+        if ($request->hasFile('gambar')) {
+            $filename = time() . '.' . $request->gambar->extension();
+            $request->gambar->move(public_path('asset/img/kegiatan'), $filename);
+            $validated['gambar'] = $filename;
+        }
+
         $kegiatan->update($validated);
 
         return redirect()->route('superadmin.kegiatan')->with('success', 'Kegiatan berhasil diperbarui.');
@@ -369,7 +432,6 @@ class SuperadminController extends Controller
         return view('superadmin.tambahHotel', compact('pegawais'));
     }
 
-
     public function hotelStore(Request $request)
     {
         $request->validate([
@@ -379,6 +441,7 @@ class SuperadminController extends Controller
             'biaya' => 'required|numeric',
             'tanggal_masuk' => 'required|date',
             'tanggal_keluar' => 'required|date|after_or_equal:tanggal_masuk',
+            'bukti_resi' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         $hotel = new Hotel();
@@ -388,11 +451,20 @@ class SuperadminController extends Controller
         $hotel->biaya = $request->biaya;
         $hotel->tanggal_masuk = $request->tanggal_masuk;
         $hotel->tanggal_keluar = $request->tanggal_keluar;
-        $hotel->created_by = Auth::id(); 
+        $hotel->created_by = Auth::id();
+
+        if ($request->hasFile('bukti_resi')) {
+            $file = $request->file('bukti_resi');
+            $filename = 'resi_' . time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('asset/img/tiket'), $filename);
+            $hotel->bukti_resi = $filename;
+        }
+
         $hotel->save();
 
         return redirect()->route('superadmin.hotel')->with('success', 'Data hotel berhasil disimpan.');
     }
+
 
    public function hotelEdit($id)
     {
@@ -403,8 +475,38 @@ class SuperadminController extends Controller
 
     public function hotelUpdate(Request $request, $id)
     {
+        $request->validate([
+            'pegawai_id' => 'required|exists:pegawai,id',
+            'nama_hotel' => 'required|string|max:255',
+            'unit_id' => 'required|exists:unit,id',
+            'biaya' => 'required|numeric',
+            'tanggal_masuk' => 'required|date',
+            'tanggal_keluar' => 'required|date|after_or_equal:tanggal_masuk',
+            'bukti_resi' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ]);
+
         $hotel = Hotel::findOrFail($id);
-        $hotel->update($request->all());
+        $hotel->pegawai_id = $request->pegawai_id;
+        $hotel->nama_hotel = $request->nama_hotel;
+        $hotel->unit_id = $request->unit_id;
+        $hotel->biaya = $request->biaya;
+        $hotel->tanggal_masuk = $request->tanggal_masuk;
+        $hotel->tanggal_keluar = $request->tanggal_keluar;
+
+        if ($request->hasFile('bukti_resi')) {
+            // Hapus file lama jika ada
+            if ($hotel->bukti_resi && file_exists(public_path('asset/img/tiket/' . $hotel->bukti_resi))) {
+                unlink(public_path('asset/img/tiket/' . $hotel->bukti_resi));
+            }
+
+            $file = $request->file('bukti_resi');
+            $filename = 'resi_' . time() . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('asset/img/tiket'), $filename);
+            $hotel->bukti_resi = $filename;
+        }
+
+        $hotel->save();
+
         return redirect()->route('superadmin.hotel')->with('success', 'Hotel berhasil diperbarui.');
     }
 
@@ -417,8 +519,15 @@ class SuperadminController extends Controller
     // ===================== PROPOSAL =====================
     public function proposal()
     {
-        $proposals = Proposal::latest()->get();
-        return view('superadmin.proposal', compact('proposals'));
+         $proposals = Proposal::all();
+
+        $years = Proposal::selectRaw('YEAR(tanggal_proposal) as year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        return view('superadmin.proposal', compact('proposals', 'years'));
+
     }
 
     public function proposalCreate()
@@ -472,39 +581,41 @@ class SuperadminController extends Controller
         return view('superadmin.tambahPegawai', compact('units'));
     }
 
-    public function pegawaiStore(Request $request)
+   public function pegawaiStore(Request $request)
     {
-        // Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'nama' => 'required|string|max:255',
+            'nama' => 'required',
             'nip' => 'required|unique:pegawai,nip',
-            'jabatan' => 'required|string|max:255',
+            'nrk' => 'required|unique:pegawai,nrk', // Validasi baru
+            'jabatan' => 'required',
             'role' => 'required|in:staff,superadmin',
             'unit_id' => 'required|exists:unit,id',
-            'alamat' => 'nullable|string',
+            'alamat' => 'nullable',
         ]);
 
-        // Buat user terlebih dahulu
         $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['nama'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
         ]);
 
-        // Buat pegawai dan hubungkan dengan user_id
         Pegawai::create([
             'user_id' => $user->id,
-            'nama' => $request->nama,
-            'nip' => $request->nip,
-            'jabatan' => $request->jabatan,
-            'role' => $request->role,
-            'unit_id' => $request->unit_id,
-            'alamat' => $request->alamat,
+            'nama' => $validated['nama'],
+            'nip' => $validated['nip'],
+            'nrk' => $validated['nrk'], // simpan NRK
+            'jabatan' => $validated['jabatan'],
+            'role' => $validated['role'],
+            'unit_id' => $validated['unit_id'],
+            'alamat' => $validated['alamat'],
         ]);
 
-        return redirect()->route('superadmin.pegawai')->with('success', 'Pegawai & akun berhasil ditambahkan.');
+        return redirect()->route('superadmin.pegawai')->with('success', 'Pegawai berhasil ditambahkan.');
     }
+
+
 
     public function pegawaiEdit($id)
     {
@@ -515,28 +626,24 @@ class SuperadminController extends Controller
 
     public function pegawaiUpdate(Request $request, $id)
     {
-        $request->validate([
+        $pegawai = Pegawai::findOrFail($id);
+
+        $validated = $request->validate([
             'nama' => 'required',
-            'nip' => 'required|unique:pegawai,nip,' . $id, // abaikan duplikat dari dirinya sendiri
+            'nip' => 'required|unique:pegawai,nip,' . $pegawai->id,
+            'nrk' => 'required|unique:pegawai,nrk,' . $pegawai->id, // validasi update NRK
             'jabatan' => 'required',
             'role' => 'required|in:staff,superadmin',
             'unit_id' => 'required|exists:unit,id',
             'alamat' => 'nullable',
         ]);
 
-        $pegawai = Pegawai::findOrFail($id);
-
-        $pegawai->update([
-            'nama' => $request->nama,
-            'nip' => $request->nip,
-            'jabatan' => $request->jabatan,
-            'role' => $request->role,
-            'unit_id' => $request->unit_id,
-            'alamat' => $request->alamat,
-        ]);
+        $pegawai->update($validated);
+        $pegawai->user->update(['name' => $validated['nama']]);
 
         return redirect()->route('superadmin.pegawai')->with('success', 'Pegawai berhasil diperbarui.');
     }
+
 
 
     public function pegawaiDestroy($id)

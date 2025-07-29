@@ -11,10 +11,11 @@
 
   <div class="bg-white shadow rounded p-4">
     <table class="w-full table-auto text-sm">
-      <thead class="bg-gray-200">
+      <thead class="bg-white-200">
         <tr>
           <th class="p-2">Nama</th>
           <th class="p-2">NIP</th>
+          <th class="p-2">NRK</th>
           <th class="p-2">Jabatan</th>
           <th class="p-2">Role</th>
           <th class="p-2">Unit</th>
@@ -27,6 +28,7 @@
           <tr class="border-b">
             <td class="p-2 text-center">{{ $data->nama }}</td>
             <td class="p-2 text-center">{{ $data->nip }}</td>
+            <td class="p-2 text-center">{{ $data->nrk }}</td>
             <td class="p-2 text-center">{{ $data->jabatan }}</td>
             <td class="p-2 text-center">{{ ucfirst($data->role) }}</td>
             <td class="p-2 text-center">{{ $data->unit->nama_unit ?? '-' }}</td>

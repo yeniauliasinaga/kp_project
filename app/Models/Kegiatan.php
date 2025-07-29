@@ -19,6 +19,7 @@ class Kegiatan extends Model
         'waktu_mulai',
         'waktu_selesai',
         'status',
+        'gambar',
         'created_by',
     ];
 

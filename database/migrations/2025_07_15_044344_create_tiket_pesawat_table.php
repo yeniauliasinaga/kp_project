@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('tiket_pesawat', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pegawai_id')->constrained('pegawai');
-            $table->enum('tujuan', ['dalam wilayah', 'luar wilayah']);
+            $table->string('tujuan');
             $table->date('tanggal');
             $table->decimal('biaya', 12, 2);
+            $table->string('resi')->comment('Nama file gambar di public/asset/img/tiket/');
             $table->foreignId('created_by')->constrained('users');
             $table->timestamps();   
         });

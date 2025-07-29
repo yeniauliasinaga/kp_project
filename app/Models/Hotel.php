@@ -18,6 +18,7 @@ class Hotel extends Model
         'biaya',
         'tanggal_masuk',
         'tanggal_keluar',
+        'bukti_resi',
         'created_by',
     ];
 

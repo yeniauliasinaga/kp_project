@@ -57,6 +57,7 @@ class KegiatanSeeder extends Seeder
             'biaya' => rand(1, 20) * 1000000,
             'waktu_mulai' => $mulai,
             'waktu_selesai' => $selesai,
+            'gambar' => 'contoh.png',
             'status' => $status,
             'created_by' => $userIds[array_rand($userIds)],
         ]);

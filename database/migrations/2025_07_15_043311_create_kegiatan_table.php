@@ -18,6 +18,7 @@ return new class extends Migration
         $table->decimal('biaya', 12, 2);
         $table->timestamp('waktu_mulai');
         $table->timestamp('waktu_selesai');
+        $table->string('gambar')->comment('Nama file gambar di public/asset/img/kegiatan/');
         $table->enum('status', ['akan_datang', 'berlangsung', 'selesai'])->default('akan_datang');
         $table->foreignId('created_by')->constrained('users');
         $table->timestamps();

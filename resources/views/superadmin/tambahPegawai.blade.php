@@ -13,7 +13,7 @@
     @if (!isset($pegawai))
     <div class="mb-4">
       <label class="block font-semibold mb-1">Email</label>
-      <input type="email" name="email" class="w-full p-2 border rounded" placeholder="Email user">
+      <input type="email" name="email" class="w-full p-2 border rounded" placeholder="Email user" value="{{ old('email') }}">
     </div>
     <div class="mb-4">
       <label class="block font-semibold mb-1">Password</label>
@@ -29,6 +29,11 @@
     <div class="mb-4">
       <label class="block font-semibold mb-1">NIP</label>
       <input type="text" name="nip" class="w-full p-2 border rounded" value="{{ old('nip', $pegawai->nip ?? '') }}">
+    </div>
+
+    <div class="mb-4">
+      <label class="block font-semibold mb-1">NRK</label>
+      <input type="text" name="nrk" class="w-full p-2 border rounded" value="{{ old('nrk', $pegawai->nrk ?? '') }}">
     </div>
 
     <div class="mb-4">
